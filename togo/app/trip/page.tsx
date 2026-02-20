@@ -50,11 +50,21 @@ export default function Trip() {
 
   return (
     <div className="flex w-full h-screen select-none">
-      <div id="dashboardContainer" className="w-6/10 min-w-1/4 overflow-auto bg-sky-50">
+      <div id="dashboardContainer" className="w-4/10 min-w-1/4 overflow-auto bg-gray-300">
+        {/* trip name card container */}
+        <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60">
+          <h1 id="tripName" className="font-[800] text-2xl">Trip to New York</h1>
+          {/* trip dates container */}
+          <div className="bg-gray-200 w-fit px-3 py-1 rounded-md mt-2 flex gap-2">
+            <img src="/calendar_icon.svg" alt="Calendar icon"></img>
+            <p id="tripDates" className="font-bold">2/16 - 2/20</p>
+          </div>
+        </div>
 
+        <div></div>
       </div>
-      <div id="resize-handle" className="w-1.5 bg-gray-300 hover:bg-gray-500 cursor-col-resize"></div>
-      <div id="mapContainer" className="flex-1 min-w-1/10 overflow-auto bg-sky-100">
+      <div id="resize-handle" className="w-1.5 bg-gray-600 hover:bg-gray-400 cursor-col-resize"></div>
+      <div id="mapContainer" className="flex-1 min-w-1/10 overflow-hidden bg-sky-100">
 
       </div>
     </div>
