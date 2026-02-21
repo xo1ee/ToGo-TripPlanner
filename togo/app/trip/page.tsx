@@ -25,10 +25,12 @@ export default function Trip() {
       isDragging = true;
       startX = e.clientX;
       startWidth = dashboardContainer.offsetWidth;
+      document.documentElement.classList.add('select-none');
     };
 
     const handleMouseUp = () => {
       isDragging = false;
+      document.documentElement.classList.remove('select-none');
     };
 
     const handleMouseMove = (e: MouseEvent): void => {
@@ -52,7 +54,7 @@ export default function Trip() {
   }, []);
 
   return (
-    <div className="flex w-full h-screen select-none">
+    <div className="flex w-full h-screen">
       <div id="dashboardContainer" className="w-4/10 min-w-1/4 overflow-auto bg-gray-300">
         {/* trip name card container */}
         <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60">
@@ -70,8 +72,8 @@ export default function Trip() {
           <h5><span className="text-green-600">Wishlist</span> - Drag items below into your itinerary</h5>
           {/* wishlist container */}
           <ItemContainer id="wishlistContainer" wishlist={true}>
-            <ItineraryItem id={0} wishlistItem={true} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
-            <ItineraryItem id={1} wishlistItem={true} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
+            <ItineraryItem id={0} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
+            <ItineraryItem id={1} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
           </ItemContainer>
         </div>
 
@@ -79,8 +81,8 @@ export default function Trip() {
         {/* trip days */}
         <div className="w-8/10 mx-auto flex flex-col gap-8 mt-10 mb-10">
           <ItineraryDay date={new Date()}>
-            <ItineraryItem id={2} wishlistItem={false} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
-            <ItineraryItem id={3} wishlistItem={false} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
+            <ItineraryItem id={2} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
+            <ItineraryItem id={3} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
           </ItineraryDay>
         </div>
       </div>

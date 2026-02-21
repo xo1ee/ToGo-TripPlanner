@@ -1,6 +1,6 @@
 interface ItineraryItemProps {
   id: number;
-  wishlistItem: boolean;
+  wishlistItem?: boolean; // passed in through ItemContainer
   destName: string;
   destDesc: string;
   destImg: string;
