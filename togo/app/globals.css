@@ -24,3 +24,44 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer base {
+  h1 {
+    font-weight: 700;
+    font-size: 40px;
+  }
+}
+
+@layer base {
+  h2 {
+    font-weight: 700;
+    font-size: 30px;
+  }
+}
+
+@layer base {
+  h3 {
+    font-weight: 700;
+    font-size: 20px;
+  }
+}
+
+@layer base {
+  h4 {
+    font-weight: 700;
+    font-size: 18px;
+  }
+}
+
+@layer base {
+  h5 {
+    font-weight: 600;
+    font-size: 16px;
+  }
+}
+
+@layer base {
+  h1, h2, h3, h4, h5 {
+    margin-bottom: 8px;
+  }
+}

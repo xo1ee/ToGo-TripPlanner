@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import WishlistItem from '@/components/WishlistItem';
 
 export default function Trip() {
   // split screen resizing logic
@@ -53,15 +54,30 @@ export default function Trip() {
       <div id="dashboardContainer" className="w-4/10 min-w-1/4 overflow-auto bg-gray-300">
         {/* trip name card container */}
         <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60">
-          <h1 id="tripName" className="font-[800] text-2xl">Trip to New York</h1>
+          <h1 id="tripName">Trip to New York</h1>
           {/* trip dates container */}
-          <div className="bg-gray-200 w-fit px-3 py-1 rounded-md mt-2 flex gap-2">
+          <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
             <img src="/calendar_icon.svg" alt="Calendar icon"></img>
             <p id="tripDates" className="font-bold">2/16 - 2/20</p>
           </div>
         </div>
 
-        <div></div>
+        {/* trip info */}
+        <div className="w-8/10 mx-auto">
+          <h2>Itinerary</h2>
+          <h5><span className="text-green-600">Wishlist</span> - Drag items below into your itinerary</h5>
+          {/* wishlist container */}
+          <div id="wishlistContainer" className="flex gap-5 overflow-hidden">
+            <WishlistItem destName="Central Place" destImg="/img_placeholder.svg" />
+            <WishlistItem destName="Empire State Building" destImg="/img_placeholder.svg" />
+          </div>
+        </div>
+
+
+        {/* trip days */}
+        <div>
+
+        </div>
       </div>
       <div id="resize-handle" className="w-1.5 bg-gray-600 hover:bg-gray-400 cursor-col-resize"></div>
       <div id="mapContainer" className="flex-1 min-w-1/10 overflow-hidden bg-sky-100">
