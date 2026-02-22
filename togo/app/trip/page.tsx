@@ -72,8 +72,8 @@ export default function Trip() {
           <h5><span className="text-green-600">Wishlist</span> - Drag items below into your itinerary</h5>
           {/* wishlist container */}
           <ItemContainer id="wishlistContainer" wishlist={true}>
-            <ItineraryItem id={0} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="Picnic" />
-            <ItineraryItem id={1} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="Picnic" />
+            <ItineraryItem id={0} destName="Central Park" destDesc="Central park is considered the heart of New York. With the park spanning over 800 acres, visitors can walk around scenic paths and discover an abundance of attractions!" destImg="https://lh3.googleusercontent.com/gps-cs-s/AHVAweqKCop4voDjTEiAlmhsYYEK0tCj8zvKerfFK201dC3bigw31EvAYeVl3aKjftWVc8sJEyoExHTH20m9cRcwA2nwVodKqlf7R1mnUhHJabnGVJaQpRQ-ta_grh-TI_OuTyeGXi2a=s1360-w1360-h1020-rw" itemNote="Picnic" />
+            <ItineraryItem id={1} destName="Central Park" destDesc="null" destImg="a.svg" itemNote="Picnic" />
           </ItemContainer>
         </div>
 
@@ -81,8 +81,8 @@ export default function Trip() {
         {/* trip days */}
         <div className="w-8/10 mx-auto flex flex-col gap-8 mt-10 mb-10">
           <ItineraryDay date={new Date()}>
-            <ItineraryItem id={2} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="Picnic" />
-            <ItineraryItem id={3} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="" />
+            <ItineraryItem id={2} destName="Central Park" destDesc="Central park is considered the heart of New York. With the park spanning over 800 acres, visitors can walk around scenic paths and discover an abundance of attractions!" destImg="https://lh3.googleusercontent.com/gps-cs-s/AHVAweqKCop4voDjTEiAlmhsYYEK0tCj8zvKerfFK201dC3bigw31EvAYeVl3aKjftWVc8sJEyoExHTH20m9cRcwA2nwVodKqlf7R1mnUhHJabnGVJaQpRQ-ta_grh-TI_OuTyeGXi2a=s1360-w1360-h1020-rw" itemNote="Picnic" />
+            <ItineraryItem id={3} destName="Central Park" destDesc="Central park is considered the heart of New York. With the park spanning over 800 acres, visitors can walk around scenic paths and discover an abundance of attractions! Central park is considered the heart of New York. With the park spanning over 800 acres, visitors can walk around scenic paths and discover an abundance of attractions!" destImg="/img_placeholder.svg" itemNote="Bike" />
           </ItineraryDay>
         </div>
       </div>

@@ -8,14 +8,21 @@ interface ItineraryItemProps {
 }
 
 export default function ItineraryItem({ id, wishlistItem, destName, destDesc, destImg, itemNote }: ItineraryItemProps) {
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src !== "/img_placeholder.svg") {
+      img.src = "/img_placeholder.svg";
+    }
+  };
+
   return (
-    <div className={`bg-gray-50 rounded-lg border-1 border-dashed overflow-hidden ${wishlistItem ? "w-55 h-18" : "w-full min-h-20"}`}>
+    <div className={`bg-gray-50 rounded-lg border-1 border-dashed overflow-hidden ${wishlistItem ? "w-55 h-18 flex-none" : "w-full min-h-20"}`}>
       {/* main destination details */}
       <div className="flex flex-nowrap justify-between items-center h-full">
-        <img src={destImg} className="h-full w-20 object-cover shrink-0" />
+        <img src={destImg} onError={handleImageError} className="h-20 w-20 object-cover shrink-0" />
         <div className="ml-2 min-w-0 flex-1">
           <h5 className="m-0 line-clamp-3">{destName}</h5>
-          <p className="truncate" hidden={wishlistItem}>{destDesc}</p>
+          <p className="text-xs line-clamp-3" hidden={wishlistItem}>{destDesc}</p>
         </div>
         <img src="/drag_icon.svg" className="w-10 h-10 grow-0" />
       </div>
