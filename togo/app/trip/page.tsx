@@ -72,8 +72,8 @@ export default function Trip() {
           <h5><span className="text-green-600">Wishlist</span> - Drag items below into your itinerary</h5>
           {/* wishlist container */}
           <ItemContainer id="wishlistContainer" wishlist={true}>
-            <ItineraryItem id={0} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
-            <ItineraryItem id={1} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
+            <ItineraryItem id={0} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="Picnic" />
+            <ItineraryItem id={1} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="Picnic" />
           </ItemContainer>
         </div>
 
@@ -81,8 +81,8 @@ export default function Trip() {
         {/* trip days */}
         <div className="w-8/10 mx-auto flex flex-col gap-8 mt-10 mb-10">
           <ItineraryDay date={new Date()}>
-            <ItineraryItem id={2} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
-            <ItineraryItem id={3} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" />
+            <ItineraryItem id={2} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="Picnic" />
+            <ItineraryItem id={3} destName="Central Place" destDesc="null" destImg="/img_placeholder.svg" itemNote="" />
           </ItineraryDay>
         </div>
       </div>
