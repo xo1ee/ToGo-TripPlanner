@@ -55,7 +55,7 @@ export default function Trip() {
 
   return (
     <div className="flex w-full h-screen">
-      <div id="dashboardContainer" className="w-4/10 min-w-1/4 overflow-auto bg-gray-300">
+      <div id="dashboardContainer" className="w-4/10 min-w-1/4 overflow-auto bg-gray-300  no-scrollbar">
         {/* trip name card container */}
         <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60">
           <h1 id="tripName">Trip to New York</h1>
