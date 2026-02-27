@@ -14,3 +14,10 @@
 .move-icon:hover > path {
   stroke: black;
 }
+
+.itinerary-item {
+  padding: 2px;
+}
+.itinerary-item:hover > div, .itinerary-item:focus {
+  box-shadow: 2px 0px black;
+}
