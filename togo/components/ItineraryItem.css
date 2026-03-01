@@ -18,3 +18,7 @@
 .itinerary-item:hover > div, .itinerary-item-dragging {
   box-shadow: 2px 0px black;
 }
+
+.save-note-button:hover > svg > path {
+  fill: black;
+}
