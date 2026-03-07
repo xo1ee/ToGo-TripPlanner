@@ -1,0 +1,29 @@
+.delete-button > svg > path {
+  fill: gray;
+}
+.delete-button:hover > svg > path {
+  fill: red;
+}
+
+.move-icon:hover {
+  cursor: grab;
+}
+.move-icon:hover > path {
+  stroke: black;
+}
+
+.itinerary-item {
+  padding: 2px;
+}
+.itinerary-item:hover > div, .itinerary-item-dragging {
+  box-shadow: 2px 0px black;
+}
+
+.save-note-button:hover > svg > path {
+  fill: black;
+}
+
+.cancel-note-button:hover > svg {
+  stroke: red;
+  stroke-width: 4;
+}
