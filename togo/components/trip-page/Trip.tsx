@@ -240,7 +240,11 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
           id="mapContainer"
           className="flex-1 min-w-1/10 overflow-hidden bg-sky-100"
         >
-          <TripMap lat={tripInfo.tripLat} lon={tripInfo.tripLon}></TripMap>
+          <TripMap
+            lat={tripInfo.location.locationLat}
+            lon={tripInfo.location.locationLon}
+            itinerary={itineraryDays}
+          ></TripMap>
         </div>
       </div>
     </DragDropContext>
