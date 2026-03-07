@@ -1,5 +1,6 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { useRef, useState } from "react";
+import "./ItineraryItem.css";
 
 export interface MapLocation {
   locationId: string;

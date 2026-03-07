@@ -178,7 +178,7 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
           <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60 flex">
             {/* trip name and dates */}
             <div>
-              <h1 id="tripName"> {tripInfo.tripName}</h1>
+              <h1 id="tripName">{tripInfo.tripName}</h1>
               <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
                 <img src="/calendar_icon.svg" alt="Calendar icon"></img>
                 <p id="tripDates" className="font-bold">
