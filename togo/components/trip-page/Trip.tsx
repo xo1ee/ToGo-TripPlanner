@@ -20,6 +20,7 @@ interface tripInfo {
   tripInfo: TripProps;
   wishlist: ItineraryItemProps[];
   itinerary: ItineraryDayProps[];
+  tripId: string;
 }
 
 export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
