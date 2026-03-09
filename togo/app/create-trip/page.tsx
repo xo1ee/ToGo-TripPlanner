@@ -25,13 +25,13 @@ export default function CreateTrip() {
           </label>
           <div id="dates" className="flex">
             <input
-              type="text"
+              type="date"
               id="destination"
               placeholder="Start Date"
               className="border border-gray-400 pl-2 mr-1 rounded-md w-1/2"
             ></input>
             <input
-              type="text"
+              type="date"
               id="destination"
               placeholder="End"
               className="border border-gray-400 pl-2 ml-1 rounded-md w-1/2"
