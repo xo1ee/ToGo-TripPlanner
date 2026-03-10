@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ItemContainer from "./ItemContainer";
-import { ItineraryItemProps, MapLocation } from "./ItineraryItem";
+import { ItineraryItemProps } from "./ItineraryItem";
+import MapLocation from "@/types/MapLocation";
 
 export interface ItineraryDayProps {
   date: Date;

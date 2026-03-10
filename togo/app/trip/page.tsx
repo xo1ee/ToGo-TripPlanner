@@ -1,14 +1,14 @@
 "use client";
 
 import {
-  MapLocation,
-  ItineraryItemProps,
+  ItineraryItemProps
 } from "@/components/trip-page/ItineraryItem";
 import { ItineraryDayProps } from "@/components/trip-page/ItineraryDay";
 import Trip from "@/components/trip-page/Trip";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getTrip, getTripActivities } from "@/lib/db";
+import MapLocation from "@/types/MapLocation";
 
 export interface TripProps {
   userId: string; // Firebase UID are strings

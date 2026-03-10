@@ -1,8 +1,8 @@
 import { Droppable } from "@hello-pangea/dnd";
 import ItineraryItem, {
-  ItineraryItemProps,
-  MapLocation,
+  ItineraryItemProps
 } from "./ItineraryItem";
+import MapLocation from "@/types/MapLocation";
 
 interface ItemContainerProps {
   id: string;

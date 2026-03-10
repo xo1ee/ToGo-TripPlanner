@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
-  ItineraryItemProps,
-  MapLocation,
+  ItineraryItemProps
 } from "@/components/trip-page/ItineraryItem";
 import ItemContainer from "@/components/trip-page/ItemContainer";
 import ItineraryDay, {
@@ -13,6 +12,7 @@ import ItineraryDay, {
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { TripProps } from "@/app/trip/page";
 import TripMap from "./TripMap";
+import MapLocation from "@/types/MapLocation";
 
 const wishlistContainerId = "wishlistContainer";
 

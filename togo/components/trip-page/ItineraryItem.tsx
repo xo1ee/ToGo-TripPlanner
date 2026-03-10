@@ -1,13 +1,7 @@
 import { Draggable } from "@hello-pangea/dnd";
 import { useRef, useState } from "react";
 import "./ItineraryItem.css";
-
-export interface MapLocation {
-  locationId: string;
-  displayName: string;
-  locationLat: number;
-  locationLon: number;
-}
+import MapLocation from "@/types/MapLocation";
 
 export interface ItineraryItemProps {
   id: number;
