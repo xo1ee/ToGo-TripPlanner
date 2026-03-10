@@ -8,7 +8,10 @@ export default function Providers({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <AuthProvider>
-      <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ""}>
+      <APIProvider
+        apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ?? ""}
+        libraries={["places"]}
+      >
         {children}
       </APIProvider>
     </AuthProvider>

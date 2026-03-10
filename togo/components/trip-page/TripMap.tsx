@@ -5,8 +5,7 @@ import {
 } from "@vis.gl/react-google-maps";
 import { ItineraryDayProps } from "./ItineraryDay";
 import {
-  MapLocation,
-  ItineraryItemProps,
+  ItineraryItemProps
 } from "@/components/trip-page/ItineraryItem";
 
 interface MapViewProps {
