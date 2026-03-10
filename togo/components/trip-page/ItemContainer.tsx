@@ -2,36 +2,19 @@ import { Droppable } from "@hello-pangea/dnd";
 import ItineraryItem, {
   ItineraryItemProps
 } from "./ItineraryItem";
-import MapLocation from "@/types/MapLocation";
-import AddItemModal from "./AddItemModal";
-import { useState } from "react";
 
 interface ItemContainerProps {
   id: string;
   wishlist: boolean;
   items: ItineraryItemProps[];
-  onItemCreate?: (location: MapLocation, containerId: number) => void;
+  onDisplayAddItemModal: (originatingContainerId: string) => void;
   onItemDelete?: (id: number) => void;
 }
 
 export default function ItemContainer(props: ItemContainerProps) {
-  const [addItemModalHidden, setAddItemModalHidden] = useState(true);
-
-  function displayAddItemModal() {
-    if (!props.onItemCreate) {
-      console.error(
-        `Item container with ID ${props.id} is missing onItemCreate Implementation`,
-      );
-      return;
-    }
-    setAddItemModalHidden(false);
-    // TODO call onItemCreate
+  function displayAddItemModalPressed() {
+    props.onDisplayAddItemModal(props.id);
   }
-
-  function closeAddItemModal() {
-    setAddItemModalHidden(true);
-  }
-
   return (
     <>
       <Droppable
@@ -57,7 +40,7 @@ export default function ItemContainer(props: ItemContainerProps) {
             </div>
             {/* drag and drop / add button card */}
             <button
-              onClick={displayAddItemModal}
+              onClick={displayAddItemModalPressed}
               className="group w-full h-20 cursor-pointer border border-1 border-dashed rounded-lg mt-5 select-none flex items-center justify-center bg-gray-50"
             >
               <h5 className="m-0 text-gray-400 group-hover:text-black font-normal">
@@ -67,7 +50,6 @@ export default function ItemContainer(props: ItemContainerProps) {
           </div>
         )}
       </Droppable>
-      <AddItemModal hidden={addItemModalHidden} onClose={closeAddItemModal} />
     </>
   );
 }

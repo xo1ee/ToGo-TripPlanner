@@ -3,9 +3,7 @@
 import MapLocation from "@/types/MapLocation";
 import { useEffect, useRef, useState } from "react";
 
-type PlaceAutocompleteSelectEvent = Event & {
-  placePrediction?: google.maps.places.PlacePrediction;
-};
+
 
 export default function CreateTrip() {
   const destinationInputRef = useRef<google.maps.places.PlaceAutocompleteElement>(null);
