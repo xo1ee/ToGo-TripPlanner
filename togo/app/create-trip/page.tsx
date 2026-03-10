@@ -61,7 +61,7 @@ export default function CreateTrip() {
         <form className="flex flex-col gap-2 w-80" onSubmit={handleSubmit}>
           <label
             htmlFor="destination"
-            className="text-black font-bold font-medium text-left"
+            className="trip-form-label"
           >
             Destination
           </label>
@@ -74,7 +74,7 @@ export default function CreateTrip() {
           ></gmp-place-autocomplete>
           <label
             htmlFor="dates"
-            className="text-black font-bold font-medium text-left"
+            className="trip-form-label"
           >
             Dates
           </label>
@@ -83,20 +83,20 @@ export default function CreateTrip() {
               type="date"
               id="destination"
               placeholder="Start Date"
-              className="border border-gray-400 pl-2 mr-1 rounded-md w-1/2"
+              className="trip-form-input mr-1"
             ></input>
             <input
               type="date"
               id="destination"
               placeholder="End"
-              className="border border-gray-400 pl-2 ml-1 rounded-md w-1/2"
+              className="trip-form-input ml-1"
             ></input>
           </div>
           <button className="text-gray-600 text-sm text-left mb-10">
             + Invite Trip-Mates
           </button>
 
-          <button className="bg-[#839F5D] text-white font-bold rounded-full pt-1 pb-1 pl-4 pr-4">
+          <button className="trip-form-submit">
             Create Trip
           </button>
         </form>

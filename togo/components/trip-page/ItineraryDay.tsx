@@ -10,7 +10,7 @@ export interface ItineraryDayProps {
   onItemDelete?: (id: number) => void;
 }
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
+export const dateFormatter = new Intl.DateTimeFormat(undefined, {
   weekday: "long",
   month: "long",
   day: "numeric",

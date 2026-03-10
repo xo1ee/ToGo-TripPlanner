@@ -174,10 +174,10 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
   }
 
   const [addItemModalHidden, setAddItemModalHidden] = useState(true);
-
-  function displayAddItemModal() {
+  const [aimOgContainerId, setAimOgContainerId] = useState<string>(wishlistContainerId);
+  function displayAddItemModal(originatingContainerId: string) {
+    setAimOgContainerId(originatingContainerId);
     setAddItemModalHidden(false);
-    // TODO call onItemCreate
   }
 
   function closeAddItemModal() {
@@ -270,7 +270,7 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
           </div>
         </div>
       </DragDropContext>
-      <AddItemModal hidden={addItemModalHidden} onClose={closeAddItemModal} onSubmit={handleItemCreate} startDate={tripInfo.startDate} numDays={daysBetweenDates(tripInfo.startDate, tripInfo.endDate)} />
+      <AddItemModal hidden={addItemModalHidden} onClose={closeAddItemModal} onSubmit={handleItemCreate} wishlistContainerId={wishlistContainerId} itineraryDayOptions={itineraryDays} defaultCheckedContainerId={aimOgContainerId} />
     </>
   );
 }
