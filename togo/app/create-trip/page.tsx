@@ -71,7 +71,7 @@ export default function CreateTrip() {
     }));
   };
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     if (!formValues.destination) {
@@ -79,7 +79,15 @@ export default function CreateTrip() {
       return;
     }
 
-    // debugging print
+    await fetch("/api/trips", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formValues),
+    });
+
+    // debugging prints
     // console.log("Values:", formValues);
   }
 
