@@ -125,7 +125,7 @@ export default function AddItemModal(props: AddItemModalProps) {
           <br/>
           
           <div className="flex justify-center">
-            <button type="submit" className="trip-form-submit cursor-pointer w-8/10">Add</button>
+            <button type="submit" className="trip-form-submit w-8/10">Add</button>
           </div>
         </form>
       </div>

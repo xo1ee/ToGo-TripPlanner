@@ -69,6 +69,7 @@ body {
     padding-bottom: 0.25rem;
     padding-left: 1rem;
     padding-right: 1rem;
+    cursor: pointer;
   }
 }
 

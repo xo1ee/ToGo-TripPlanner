@@ -104,12 +104,11 @@ export default function CreateTrip() {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex-col items-center text-center bg-white rounded-lg shadow-black/75 shadow-lg p-4 pb-15">
-        <h1 className="text-2xl font-bold text-black mb-6">Create a Trip</h1>
+        <h2>Create a Trip</h2>
         <br></br>
         <form className="flex flex-col gap-2 w-80" onSubmit={handleSubmit}>
           <label
             htmlFor="location"
-            className="text-black font-bold font-medium text-left"
           >
             Destination
           </label>
