@@ -6,7 +6,7 @@ import MapLocation from "@/types/MapLocation";
 export interface ItineraryDayProps {
   date: Date;
   items: ItineraryItemProps[];
-  onDisplayAddItemModal: (originatingContainerId: string) => void;
+  onDisplayAddItemModal?: (originatingContainerId: string) => void;
   onItemDelete?: (id: number) => void;
 }
 

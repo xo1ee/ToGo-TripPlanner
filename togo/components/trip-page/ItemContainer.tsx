@@ -7,13 +7,17 @@ interface ItemContainerProps {
   id: string;
   wishlist: boolean;
   items: ItineraryItemProps[];
-  onDisplayAddItemModal: (originatingContainerId: string) => void;
+  onDisplayAddItemModal?: (originatingContainerId: string) => void;
   onItemDelete?: (id: number) => void;
 }
 
 export default function ItemContainer(props: ItemContainerProps) {
   function displayAddItemModalPressed() {
-    props.onDisplayAddItemModal(props.id);
+    if (props.onDisplayAddItemModal) {
+      props.onDisplayAddItemModal(props.id);
+    } else {
+      console.error("No onDisplayAddItemModal implementation");
+    }
   }
   return (
     <>

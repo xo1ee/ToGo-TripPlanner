@@ -99,8 +99,6 @@ export async function createTrip(
 export async function getTripActivities(
   tripId: string,
   startDate: Date,
-  onDisplayAddItemModal: (originatingContainerId: string) => void,
-  onItemDelete?: (id: number) => void,
 ): Promise<{
   wishlist: ItineraryItemProps[];
   itinerary: ItineraryDayProps[];
@@ -156,7 +154,7 @@ export async function getTripActivities(
     .map(([dayIndex, items]) => {
       const date = new Date(startDate);
       date.setUTCDate(date.getUTCDate() + dayIndex);
-      return { date, items, onDisplayAddItemModal, onItemDelete };
+      return { date, items };
     });
 
   return { wishlist, itinerary };
