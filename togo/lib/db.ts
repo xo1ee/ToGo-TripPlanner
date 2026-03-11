@@ -11,7 +11,7 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "./firebase";
-import { ItineraryItemProps} from "@/components/trip-page/ItineraryItem";
+import { ItineraryItemProps } from "@/components/trip-page/ItineraryItem";
 import { ItineraryDayProps } from "@/components/trip-page/ItineraryDay";
 import { TripProps } from "@/app/trip/page";
 import MapLocation from "@/types/MapLocation";
@@ -80,7 +80,7 @@ export async function createTrip(
   tripName: string,
   startDate: Date,
   endDate: Date,
-  location: MapLocation
+  location: MapLocation,
 ): Promise<string> {
   const ref = await addDoc(collection(db, "trips"), {
     userId,
@@ -98,14 +98,14 @@ export async function createTrip(
    startDate is needed here to convert day indexes back into actual dates. */
 export async function getTripActivities(
   tripId: string,
-  startDate: Date
+  startDate: Date,
 ): Promise<{
   wishlist: ItineraryItemProps[];
   itinerary: ItineraryDayProps[];
 }> {
   const q = query(
     collection(db, "trips", tripId, "activities"),
-    orderBy("index")
+    orderBy("index"),
   );
   const snap = await getDocs(q);
 
@@ -163,7 +163,7 @@ export async function getTripActivities(
 /* Add an activity to a trip */
 export async function addActivity(
   tripId: string,
-  activity: Omit<ActivityDocument, "id" | "tripId">
+  activity: Omit<ActivityDocument, "id" | "tripId">,
 ): Promise<string> {
   const ref = await addDoc(collection(db, "trips", tripId, "activities"), {
     ...activity,
@@ -176,7 +176,7 @@ export async function addActivity(
 export async function updateActivityNote(
   tripId: string,
   firestoreId: string,
-  note: string
+  note: string,
 ): Promise<void> {
   await updateDoc(doc(db, "trips", tripId, "activities", firestoreId), {
     itemNote: note,
@@ -189,7 +189,7 @@ export async function moveActivity(
   firestoreId: string,
   day: number | null,
   isWishlist: boolean,
-  index: number
+  index: number,
 ): Promise<void> {
   await updateDoc(doc(db, "trips", tripId, "activities", firestoreId), {
     day,
@@ -201,7 +201,7 @@ export async function moveActivity(
 /* Delete an activity */
 export async function deleteActivity(
   tripId: string,
-  firestoreId: string
+  firestoreId: string,
 ): Promise<void> {
   await deleteDoc(doc(db, "trips", tripId, "activities", firestoreId));
 }

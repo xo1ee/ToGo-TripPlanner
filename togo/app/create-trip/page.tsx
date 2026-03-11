@@ -1,18 +1,30 @@
 "use client";
 
 import MapLocation from "@/types/MapLocation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-
+type PlaceAutocompleteSelectEvent = Event & {
+  placePrediction?: google.maps.places.PlacePrediction;
+};
 
 export default function CreateTrip() {
-  const destinationInputRef = useRef<google.maps.places.PlaceAutocompleteElement>(null);
-  const [selectedPlace, setSelectedPlace] = useState<MapLocation | null>(null);
+  const router = useRouter();
+  const locationInputRef =
+    useRef<google.maps.places.PlaceAutocompleteElement>(null);
 
+  const [formValues, setFormValues] = useState<FormValues>({
+    location: null,
+    startDate: null,
+    endDate: null,
+    users: [""],
+  });
+
+  // updates form values w/ selected location
   useEffect(() => {
-    const destInput = destinationInputRef.current;
-    if (!destInput) {
-      console.error("destinationInputRef.current is null");
+    const locationInput = locationInputRef.current;
+    if (!locationInput) {
+      console.error("locationInputRef.current is null");
       return;
     }
 
@@ -26,33 +38,55 @@ export default function CreateTrip() {
       });
 
       if (place) {
-        setSelectedPlace({
-          locationId: place.id,
-          displayName: place.displayName ?? "Unknown",
-          formattedAddress: place.formattedAddress ?? "",
-          locationLat: place.location?.lat() ?? 0,
-          locationLon: place.location?.lng() ?? 0
-        })
+        setFormValues((prev) => ({
+          ...prev,
+          location: {
+            locationId: place.id,
+            displayName: place.displayName ?? "Unknown",
+            formattedAddress: place.formattedAddress ?? "",
+            locationLat: place.location?.lat() ?? 0,
+            locationLon: place.location?.lng() ?? 0,
+          },
+        }));
       } else {
         console.error("Failed to fetch Place");
       }
-    };
+    }
 
-    destInput.addEventListener("gmp-select", onSelect);
-    return () => destInput.removeEventListener("gmp-select", onSelect);
+    locationInput.addEventListener("gmp-select", onSelect);
+    return () => locationInput.removeEventListener("gmp-select", onSelect);
   }, []);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  // updates remaining form values
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!selectedPlace) {
+    if (!formValues.location) {
       console.warn("No place selected yet");
       return;
     }
 
-    console.log(selectedPlace);
+    const res = await fetch("/api/trips", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formValues),
+    });
+
+    const data = await res.json();
+
+    router.push(`/trip/${data.tripId}`);
   }
-  
+
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="flex-col items-center text-center bg-white rounded-lg shadow-black/75 shadow-lg p-4 pb-15">
@@ -66,9 +100,9 @@ export default function CreateTrip() {
             Destination
           </label>
           <gmp-place-autocomplete
-            id="destination"
-            ref={destinationInputRef}
-            name="destination"
+            id="location"
+            ref={locationInputRef}
+            name="location"
             {...({ placeholder: "E.g. New York" } as any)}
             className="border border-gray-400 rounded-md"
           ></gmp-place-autocomplete>
@@ -81,18 +115,20 @@ export default function CreateTrip() {
           <div id="dates" className="flex">
             <input
               type="date"
-              id="destination"
+              name="startDate"
+              id="startDate"
               placeholder="Start Date"
               className="trip-form-input mr-1"
             ></input>
             <input
               type="date"
-              id="destination"
+              name="endDate"
+              id="endDate"
               placeholder="End"
               className="trip-form-input ml-1"
             ></input>
           </div>
-          <button className="text-gray-600 text-sm text-left mb-10">
+          <button className="text-gray-600 hover:text-blue-500 text-sm text-left mb-10">
             + Invite Trip-Mates
           </button>
 
