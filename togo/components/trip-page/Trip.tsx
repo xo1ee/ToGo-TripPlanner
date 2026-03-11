@@ -13,6 +13,7 @@ import TripMap from "./TripMap";
 import MapLocation from "@/types/MapLocation";
 import Modal from "./Modal";
 import AddItem, { AddItemFormSubmitData } from "./AddItem";
+import EditTripName from "./EditTripName";
 import {
   ActivityDocument,
   addActivity,
@@ -22,7 +23,7 @@ import {
 
 const wishlistContainerId = "wishlistContainer";
 
-interface tripInfo {
+interface tripInfoProp {
   tripInfo: TripProps;
   wishlist: ItineraryItemProps[];
   itinerary: ItineraryDayProps[];
@@ -34,7 +35,21 @@ export default function Trip({
   wishlist,
   itinerary,
   tripId,
-}: tripInfo) {
+}: tripInfoProp) {
+  const [tripName, setTripName] = useState<string>(tripInfo?.tripName ?? "");
+
+  const [wishlistItems, setWishlistItems] =
+    useState<ItineraryItemProps[]>(wishlist);
+  const [itineraryDays, setItineraryDays] =
+    useState<ItineraryDayProps[]>(itinerary);
+
+  // AddItemModel code (popup to add new destination)
+  const [addItemModalHidden, setAddItemModalHidden] = useState(true);
+  const [titleModalHidden, setTitleModalHidden] = useState(true);
+  const [aimOgContainerId, setAimOgContainerId] =
+    useState<string>(wishlistContainerId);
+  const [addItemModalRenderKey, setAddItemModalRenderKey] = useState(0);
+
   // split screen resizing logic
   useEffect(() => {
     const dashboardContainer = document.getElementById("dashboardContainer");
@@ -84,10 +99,6 @@ export default function Trip({
     };
   }, []);
 
-  const [wishlistItems, setWishlistItems] =
-    useState<ItineraryItemProps[]>(wishlist);
-  const [itineraryDays, setItineraryDays] =
-    useState<ItineraryDayProps[]>(itinerary);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   function handleItemFocus(id: string) {
@@ -291,12 +302,6 @@ export default function Trip({
     }
   }
 
-  // AddItemModel code (popup to add new destination)
-  const [addItemModalHidden, setAddItemModalHidden] = useState(true);
-  const [aimOgContainerId, setAimOgContainerId] =
-    useState<string>(wishlistContainerId);
-  const [addItemModalRenderKey, setAddItemModalRenderKey] = useState(0);
-
   // takes a function as a parameter, this function must be a set function
   // for a useState variable that controls whether a Modal is hidden
   function closeModal(setter: (bool: boolean) => void) {
@@ -316,35 +321,66 @@ export default function Trip({
     closeModal(setAddItemModalHidden);
   }
 
+  /**
+   * calls PATCH to update the current trip's trip name
+   * @param event contains form content (new trip name)
+   */
+  async function editTripName(event: React.SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+    const newTripName = String(formData.get("name") ?? "");
+
+    const res = await fetch(`/api/trips`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id: tripId, tripName: newTripName }),
+    });
+
+    const data = await res.json();
+    setTripName(newTripName);
+    const form = event.target as HTMLFormElement;
+    form.reset();
+  }
+
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
         <div className="flex w-full h-screen">
           <div
             id="dashboardContainer"
-            className="w-4/10 min-w-1/4 overflow-auto bg-gray-300  no-scrollbar"
+            className="w-4/10 min-w-1/4 overflow-auto bg-gray-300 no-scrollbar"
           >
             {/* trip name card container */}
             <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60 flex">
               {/* trip name and dates */}
               <div>
-                <h1 id="tripName">{tripInfo.tripName}</h1>
+                <h1 id="tripName">{tripName}</h1>
                 <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
                   <img src="/calendar_icon.svg" alt="Calendar icon"></img>
                   <p id="tripDates" className="font-bold">
-                    {new Date(tripInfo.startDate).toLocaleDateString("en-US", {
-                      timeZone: "UTC",
+                    {tripInfo.startDate.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}{" "}
                     -{" "}
-                    {new Date(tripInfo.endDate).toLocaleDateString("en-US", {
-                      timeZone: "UTC",
+                    {tripInfo.endDate.toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
                     })}
                   </p>
                 </div>
               </div>
               {/* edit trip button */}
               <div className="ml-auto mt-3 position-static">
-                <button className="h-7 w-7 cursor-pointer">
+                <button
+                  className="h-7 w-7 cursor-pointer"
+                  onClick={() => setTitleModalHidden(false)}
+                >
                   <img src="/menu_vertical_icon.svg" alt="Edit Trip Icon" />
                 </button>
               </div>
@@ -408,12 +444,27 @@ export default function Trip({
       >
         <AddItem
           key={addItemModalRenderKey}
-          onSubmit={handleItemCreate}
+          onSubmit={(event) => {
+            handleItemCreate(event);
+            closeModal(setAddItemModalHidden);
+          }}
           wishlistContainerId={wishlistContainerId}
           itineraryDayOptions={itineraryDays}
           defaultCheckedContainerId={aimOgContainerId}
           tripLocation={tripInfo.location}
         />
+      </Modal>
+
+      <Modal
+        hidden={titleModalHidden}
+        onClose={() => closeModal(setTitleModalHidden)}
+      >
+        <EditTripName
+          handleSubmit={(event) => {
+            editTripName(event);
+            closeModal(setTitleModalHidden);
+          }}
+        ></EditTripName>
       </Modal>
     </>
   );

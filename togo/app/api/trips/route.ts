@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
-import { Timestamp, collection, addDoc } from "firebase/firestore";
+import {
+  Timestamp,
+  collection,
+  addDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 const TRIPS_COLLECTION = "trips";
 
 export async function POST(req: NextRequest) {
@@ -28,6 +34,29 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to create post" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    console.log("in patch");
+    const formValues = await req.json();
+    const { id, tripName } = formValues;
+
+    console.log("in patch--id: " + id + " " + tripName);
+
+    const docRef = doc(db, "trips", id);
+    await updateDoc(docRef, formValues);
+
+    return NextResponse.json(
+      { tripId: docRef.id, message: "Trip name editted" },
+      { status: 201 },
+    );
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to create patch" },
       { status: 500 },
     );
   }
