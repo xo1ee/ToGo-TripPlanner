@@ -140,6 +140,7 @@ export default function CreateTrip() {
               name="endDate"
               id="endDate"
               placeholder="End"
+              onChange={handleChange}
               className="trip-form-input ml-1"
             ></input>
           </div>
