@@ -17,9 +17,23 @@ export interface ItineraryItemProps {
   onDelete?: (id: string) => void;
 }
 
+interface ExtraDetails { // extra details section info that has to be called from api
+  retrievedAlready?: boolean;
+  googleMapsUrl: string;
+  enterpriseUrl?: string;
+}
+
 export default function ItineraryItem(props: ItineraryItemProps) {
+  const [extraDetails, setExtraDetails] = useState<ExtraDetails>({
+    googleMapsUrl: `https://www.google.com/maps/place/?q=place_id:${props.location?.locationId}`
+  });
+
   const [isExpanded, setIsExpanded] = useState(false);
   function expandItem() {
+    if (!isExpanded && !extraDetails.retrievedAlready) {
+      setExtraDetails(prev => ({ ...prev, retrievedAlready: true }));
+      getExtraDetails();
+    }
     setIsExpanded((prev) => !prev);
   }
 
@@ -55,6 +69,21 @@ export default function ItineraryItem(props: ItineraryItemProps) {
       noteRef.current.value = originalNote;
     }
     setIsEditingNote(false);
+  }
+
+  async function getExtraDetails() {
+    if (!props.location?.locationId) return;
+    try {
+      const place = new google.maps.places.Place({ id: props.location.locationId });
+      await place.fetchFields({ fields: ["googleMapsURI", "websiteURI"] });
+      setExtraDetails(prev => ({
+        ...prev,
+        googleMapsUrl: place.googleMapsURI ?? prev.googleMapsUrl,
+        enterpriseUrl: place.websiteURI ?? undefined,
+      }));
+    } catch (err) {
+      console.error("Failed to fetch extra details:", err);
+    }
   }
 
   return (
@@ -169,7 +198,20 @@ export default function ItineraryItem(props: ItineraryItemProps) {
 
               {/* extra details */}
               <div className="border-t-1 border-dashed overflow-hidden px-2 py-1" hidden={!isExpanded}>
-                <p>one day there will be details here</p>
+                <div className="flex w-full items-center gap-1">
+                  <a target="_blank" href={extraDetails.googleMapsUrl} rel="noopener noreferrer">
+                    <img src="/map_search_icon.svg" className="h-5 w-5" />
+                  </a>
+                  <p className="line-clamp-2">{props.location?.formattedAddress}</p>
+                </div>
+                <div className="flex w-full items-center gap-1" hidden={!extraDetails.enterpriseUrl}>
+                  <a target="_blank" href={extraDetails.enterpriseUrl ?? ""} rel="noopener noreferrer">
+                    <img src="/globe.svg" className="h-5 w-5" />
+                  </a>
+                  <a target="_blank" href={extraDetails.enterpriseUrl ?? ""} className="truncate w-5/10 hover:underline" rel="noopener noreferrer">
+                    {extraDetails.enterpriseUrl ? new URL(extraDetails.enterpriseUrl).origin + "/" : ""}
+                  </a>
+                </div>
               </div>
             </div>
             {/* delete button */}
