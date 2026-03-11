@@ -44,4 +44,31 @@ body {
   h1, h2, h3, h4, h5 {
     margin-bottom: 8px;
   }
+  label, legend {
+    color: #000;
+    font-weight: 600;
+    text-align: left;
+  }
+  form > input {
+    border: 1px solid #9ca3af;
+    border-radius: 0.375rem;
+    width: 50%;
+    padding-left: 0.5rem;
+  }
+  fieldset {
+    background-color: #ebebeb;
+    padding: 10px;
+    border-radius: 0.375rem;
+  }
+}
+
+.trip-form-submit {
+  background-color: #839f5d;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 9999px;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }

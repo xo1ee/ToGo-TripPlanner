@@ -11,6 +11,7 @@ import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { TripProps } from "@/app/trip/page";
 import TripMap from "./TripMap";
 import MapLocation from "@/types/MapLocation";
+import AddItemModal, { AddItemModalFormSubmitData } from "./AddItemModal";
 
 const wishlistContainerId = "wishlistContainer";
 
@@ -71,10 +72,8 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
     };
   }, []);
 
-  const [wishlistItems, setWishlistItems] =
-    useState<ItineraryItemProps[]>(wishlist);
-  const [itineraryDays, setItineraryDays] =
-    useState<ItineraryDayProps[]>(itinerary);
+  const [wishlistItems, setWishlistItems] = useState<ItineraryItemProps[]>(wishlist);
+  const [itineraryDays, setItineraryDays] = useState<ItineraryDayProps[]>(itinerary);
 
   /**
    * Get ItineraryItems from ID of ItineraryDay/Wishlist
@@ -135,7 +134,7 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
       );
     }
 
-    // TODO: update database
+    // TODO: update database to move ItineraryItem from one container to another
   }
 
   /**
@@ -143,8 +142,10 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
    * @param location location of item
    * @param containerId id of container
    */
-  function createItineraryItem(location: MapLocation, containerId: number) {
-    // TODO: create an ItineraryItem and add it to container
+  function createItineraryItem(location: MapLocation, containerId: string) {
+    // TODO: create an ItineraryItem with default values
+    // TODO: add item to database to get ID
+    // TODO: add ItineraryItem it to container
     // TODO: add marker to map
   }
 
@@ -166,86 +167,107 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
     // TODO: remove items marker from map
   }
 
+  // AddItemModel code (popup to add new destination)
+  const [addItemModalHidden, setAddItemModalHidden] = useState(true);
+  const [aimOgContainerId, setAimOgContainerId] = useState<string>(wishlistContainerId);
+  const [addItemModalRenderKey, setAddItemModalRenderKey] = useState(0);
+  function displayAddItemModal(originatingContainerId: string) {
+    setAimOgContainerId(originatingContainerId);
+    setAddItemModalRenderKey((prev) => prev + 1); // re-renders so defaulChecked is updated
+    setAddItemModalHidden(false);
+  }
+  function closeAddItemModal() {
+    setAddItemModalHidden(true);
+  }
+  function handleItemCreate(data: AddItemModalFormSubmitData) {
+    data.addedToContainerIds.forEach(id => {
+      createItineraryItem(data.location, id);
+    })
+  }
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex w-full h-screen">
-        <div
-          id="dashboardContainer"
-          className="w-4/10 min-w-1/4 overflow-auto bg-gray-300  no-scrollbar"
-        >
-          {/* trip name card container */}
-          <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60 flex">
-            {/* trip name and dates */}
-            <div>
-              <h1 id="tripName">{tripInfo.tripName}</h1>
-              <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
-                <img src="/calendar_icon.svg" alt="Calendar icon"></img>
-                <p id="tripDates" className="font-bold">
-                  {new Date(tripInfo.startDate).toLocaleDateString("en-US", {
-                    timeZone: "UTC",
-                  })}{" "}
-                  -{" "}
-                  {new Date(tripInfo.endDate).toLocaleDateString("en-US", {
-                    timeZone: "UTC",
-                  })}
-                </p>
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <div className="flex w-full h-screen">
+          <div
+            id="dashboardContainer"
+            className="w-4/10 min-w-1/4 overflow-auto bg-gray-300  no-scrollbar"
+          >
+            {/* trip name card container */}
+            <div className="w-8/10 mx-auto my-8 bg-gray-50 rounded-lg p-3 drop-shadow-lg/60 flex">
+              {/* trip name and dates */}
+              <div>
+                <h1 id="tripName">{tripInfo.tripName}</h1>
+                <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
+                  <img src="/calendar_icon.svg" alt="Calendar icon"></img>
+                  <p id="tripDates" className="font-bold">
+                    {new Date(tripInfo.startDate).toLocaleDateString("en-US", {
+                      timeZone: "UTC",
+                    })}{" "}
+                    -{" "}
+                    {new Date(tripInfo.endDate).toLocaleDateString("en-US", {
+                      timeZone: "UTC",
+                    })}
+                  </p>
+                </div>
+              </div>
+              {/* edit trip button */}
+              <div className="ml-auto mt-3 position-static">
+                <button className="h-7 w-7 cursor-pointer">
+                  <img src="/menu_vertical_icon.svg" alt="Edit Trip Icon" />
+                </button>
               </div>
             </div>
-            {/* edit trip button */}
-            <div className="ml-auto mt-3 position-static">
-              <button className="h-7 w-7 cursor-pointer">
-                <img src="/menu_vertical_icon.svg" alt="Edit Trip Icon" />
-              </button>
-            </div>
-          </div>
 
-          {/* trip info */}
-          <div className="w-8/10 mx-auto">
-            <h2>Itinerary</h2>
-            <h5>
-              <span className="text-green-600">Wishlist</span> - Drag items
-              below into your itinerary
-            </h5>
-            {/* wishlist container */}
-            <ItemContainer
-              id={wishlistContainerId}
-              wishlist={true}
-              items={wishlistItems}
-              onItemCreate={createItineraryItem}
-              onItemDelete={deleteItineraryItem}
-            />
-          </div>
-
-          {/* trip days */}
-          <div
-            id="itineraryDaysContainer"
-            className="w-8/10 mx-auto flex flex-col gap-8 mt-10 mb-10"
-          >
-            {itineraryDays.map((dayContainer) => (
-              <ItineraryDay
-                key={getItineraryDayId(dayContainer.date)}
-                {...dayContainer}
-                onItemCreate={createItineraryItem}
+            {/* trip info */}
+            <div className="w-8/10 mx-auto">
+              <h2>Itinerary</h2>
+              <h5>
+                <span className="text-green-600">Wishlist</span> - Drag items
+                below into your itinerary
+              </h5>
+              {/* wishlist container */}
+              <ItemContainer
+                id={wishlistContainerId}
+                wishlist={true}
+                items={wishlistItems}
+                onDisplayAddItemModal={displayAddItemModal}
                 onItemDelete={deleteItineraryItem}
               />
-            ))}
+            </div>
+
+            {/* trip days */}
+            <div
+              id="itineraryDaysContainer"
+              className="w-8/10 mx-auto flex flex-col gap-8 mt-10 mb-10"
+            >
+              {itineraryDays.map((dayContainer) => (
+                <ItineraryDay
+                  key={getItineraryDayId(dayContainer.date)}
+                  {...dayContainer}
+                  onDisplayAddItemModal={displayAddItemModal}
+                  onItemDelete={deleteItineraryItem}
+                />
+              ))}
+            </div>
+          </div>
+          <div
+            id="resize-handle"
+            className="w-1.5 bg-gray-600 hover:bg-gray-400 cursor-col-resize"
+          ></div>
+          <div
+            id="mapContainer"
+            className="flex-1 min-w-1/10 overflow-hidden bg-sky-100"
+          >
+            <TripMap
+              lat={tripInfo.location.locationLat}
+              lon={tripInfo.location.locationLon}
+              itinerary={itineraryDays}
+            ></TripMap>
           </div>
         </div>
-        <div
-          id="resize-handle"
-          className="w-1.5 bg-gray-600 hover:bg-gray-400 cursor-col-resize"
-        ></div>
-        <div
-          id="mapContainer"
-          className="flex-1 min-w-1/10 overflow-hidden bg-sky-100"
-        >
-          <TripMap
-            lat={tripInfo.location.locationLat}
-            lon={tripInfo.location.locationLon}
-            itinerary={itineraryDays}
-          ></TripMap>
-        </div>
-      </div>
-    </DragDropContext>
+      </DragDropContext>
+      <AddItemModal key={addItemModalRenderKey} hidden={addItemModalHidden} onClose={closeAddItemModal} onSubmit={handleItemCreate} wishlistContainerId={wishlistContainerId} itineraryDayOptions={itineraryDays} defaultCheckedContainerId={aimOgContainerId} tripLocation={tripInfo.location} />
+    </>
   );
 }
