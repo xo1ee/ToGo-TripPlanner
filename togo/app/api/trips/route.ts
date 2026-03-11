@@ -10,9 +10,10 @@ export async function POST(req: NextRequest) {
     // TODO: add value validation
 
     // parse request body
-    const { location, startDate, endDate, users } = formValues;
+    const { tripName, location, startDate, endDate, users } = formValues;
 
     const docRef = await addDoc(collection(db, TRIPS_COLLECTION), {
+      tripName,
       location,
       startDate: startDate ? Timestamp.fromDate(new Date(startDate)) : null,
       endDate: endDate ? Timestamp.fromDate(new Date(endDate)) : null,

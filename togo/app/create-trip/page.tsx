@@ -16,6 +16,7 @@ type PlaceAutocompleteSelectEvent = Event & {
 };
 
 interface FormValues {
+  tripName: string | null;
   location: MapLocation | null;
   startDate: string | null;
   endDate: string | null;
@@ -28,6 +29,7 @@ export default function CreateTrip() {
     useRef<google.maps.places.PlaceAutocompleteElement>(null);
 
   const [formValues, setFormValues] = useState<FormValues>({
+    tripName: null,
     location: null,
     startDate: null,
     endDate: null,
@@ -107,11 +109,18 @@ export default function CreateTrip() {
         <h2>Create a Trip</h2>
         <br></br>
         <form className="flex flex-col gap-2 w-80" onSubmit={handleSubmit}>
-          <label
-            htmlFor="location"
-          >
-            Destination
+          <label htmlFor="name" className="trip-form-label">
+            Trip Name
           </label>
+          <input
+            type="text"
+            name="tripName"
+            id="tripName"
+            placeholder="ie 'New Year's Trip'"
+            onChange={handleChange}
+            className="trip-form-input mr-1 w-full"
+          ></input>
+          <label htmlFor="location">Destination</label>
           <gmp-place-autocomplete
             id="location"
             ref={locationInputRef}
@@ -119,10 +128,7 @@ export default function CreateTrip() {
             {...({ placeholder: "E.g. New York" } as any)}
             className="border border-gray-400 rounded-md"
           ></gmp-place-autocomplete>
-          <label
-            htmlFor="dates"
-            className="trip-form-label"
-          >
+          <label htmlFor="dates" className="trip-form-label">
             Dates
           </label>
           <div id="dates" className="flex">
@@ -146,10 +152,7 @@ export default function CreateTrip() {
           <button className="text-gray-600 hover:text-blue-500 text-sm text-left mb-10">
             + Invite Trip-Mates
           </button>
-
-          <button className="trip-form-submit">
-            Create Trip
-          </button>
+          <button className="trip-form-submit">Create Trip</button>
         </form>
       </div>
     </div>
