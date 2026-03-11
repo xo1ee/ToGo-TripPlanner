@@ -11,8 +11,14 @@ import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import { TripProps } from "@/app/trip/page";
 import TripMap from "./TripMap";
 import MapLocation from "@/types/MapLocation";
-import AddItemModal, { AddItemModalFormSubmitData } from "./AddItemModal";
-import { ActivityDocument, addActivity, deleteActivity, moveActivity } from "@/lib/db";
+import Modal from "./Modal";
+import AddItem, { AddItemFormSubmitData } from "./AddItem";
+import {
+  ActivityDocument,
+  addActivity,
+  deleteActivity,
+  moveActivity,
+} from "@/lib/db";
 
 const wishlistContainerId = "wishlistContainer";
 
@@ -23,7 +29,12 @@ interface tripInfo {
   tripId: string;
 }
 
-export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo) {
+export default function Trip({
+  tripInfo,
+  wishlist,
+  itinerary,
+  tripId,
+}: tripInfo) {
   // split screen resizing logic
   useEffect(() => {
     const dashboardContainer = document.getElementById("dashboardContainer");
@@ -73,8 +84,10 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
     };
   }, []);
 
-  const [wishlistItems, setWishlistItems] = useState<ItineraryItemProps[]>(wishlist);
-  const [itineraryDays, setItineraryDays] = useState<ItineraryDayProps[]>(itinerary);
+  const [wishlistItems, setWishlistItems] =
+    useState<ItineraryItemProps[]>(wishlist);
+  const [itineraryDays, setItineraryDays] =
+    useState<ItineraryDayProps[]>(itinerary);
 
   /**
    * Get ItineraryItems from ID of ItineraryDay/Wishlist
@@ -87,6 +100,7 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
       : itineraryDays.find((d) => getItineraryDayId(d.date) === id)?.items ||
           [];
   }
+
   // drag and drop logic
   function onDragEnd(result: DropResult) {
     const { source, destination } = result;
@@ -175,10 +189,13 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
    * @param location location of item
    * @param containerId id of container
    */
-  async function createItineraryItem(location: MapLocation, containerId: string) {
-    let containerItems = getItemContainerItems(containerId);
-    let isWishlistItem = containerId === wishlistContainerId;
-    
+  async function createItineraryItem(
+    location: MapLocation,
+    containerId: string,
+  ) {
+    const containerItems = getItemContainerItems(containerId);
+    const isWishlistItem = containerId === wishlistContainerId;
+
     // fetch place description and photo from Google Places API (new)
     let itemDesc = location.displayName;
     let destImg: string | undefined;
@@ -194,14 +211,14 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
     }
 
     // create an ItineraryItem with default values
-    let itinItem: ItineraryItemProps = {
+    const itinItem: ItineraryItemProps = {
       firestoreId: "",
-      index: (isWishlistItem ? 0 : containerItems.length),
+      index: isWishlistItem ? 0 : containerItems.length,
       itemName: location.displayName,
       wishlistItem: isWishlistItem,
       itemDesc,
       destImg,
-      location
+      location,
     };
 
     const activityPayload: Omit<ActivityDocument, "tripId" | "id"> = {
@@ -211,10 +228,13 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
       destImg: itinItem.destImg,
       location: itinItem.location,
       isWishlist: isWishlistItem,
-      day: isWishlistItem ? null : 
-        itineraryDays.findIndex((day) => getItineraryDayId(day.date) === containerId) ?? null,
+      day: isWishlistItem
+        ? null
+        : (itineraryDays.findIndex(
+            (day) => getItineraryDayId(day.date) === containerId,
+          ) ?? null),
     };
-    let fid = await addActivity(tripId, activityPayload);
+    const fid = await addActivity(tripId, activityPayload);
     itinItem.firestoreId = fid;
 
     // add ItineraryItem it to container
@@ -268,20 +288,27 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
 
   // AddItemModel code (popup to add new destination)
   const [addItemModalHidden, setAddItemModalHidden] = useState(true);
-  const [aimOgContainerId, setAimOgContainerId] = useState<string>(wishlistContainerId);
+  const [aimOgContainerId, setAimOgContainerId] =
+    useState<string>(wishlistContainerId);
   const [addItemModalRenderKey, setAddItemModalRenderKey] = useState(0);
+
+  // takes a function as a parameter, this function must be a set function
+  // for a useState variable that controls whether a Modal is hidden
+  function closeModal(setter: (bool: boolean) => void) {
+    setter(true);
+  }
+
   function displayAddItemModal(originatingContainerId: string) {
     setAimOgContainerId(originatingContainerId);
-    setAddItemModalRenderKey((prev) => prev + 1); // re-renders so defaulChecked is updated
+    setAddItemModalRenderKey((prev) => prev + 1); // re-renders so defaultChecked is updated
     setAddItemModalHidden(false);
   }
-  function closeAddItemModal() {
-    setAddItemModalHidden(true);
-  }
-  function handleItemCreate(data: AddItemModalFormSubmitData) {
-    data.addedToContainerIds.forEach(id => {
+
+  function handleItemCreate(data: AddItemFormSubmitData) {
+    data.addedToContainerIds.forEach((id) => {
       createItineraryItem(data.location, id);
-    })
+    });
+    closeModal(setAddItemModalHidden);
   }
 
   return (
@@ -368,7 +395,19 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
           </div>
         </div>
       </DragDropContext>
-      <AddItemModal key={addItemModalRenderKey} hidden={addItemModalHidden} onClose={closeAddItemModal} onSubmit={handleItemCreate} wishlistContainerId={wishlistContainerId} itineraryDayOptions={itineraryDays} defaultCheckedContainerId={aimOgContainerId} tripLocation={tripInfo.location} />
+      <Modal
+        hidden={addItemModalHidden}
+        onClose={() => closeModal(setAddItemModalHidden)}
+      >
+        <AddItem
+          key={addItemModalRenderKey}
+          onSubmit={handleItemCreate}
+          wishlistContainerId={wishlistContainerId}
+          itineraryDayOptions={itineraryDays}
+          defaultCheckedContainerId={aimOgContainerId}
+          tripLocation={tripInfo.location}
+        />
+      </Modal>
     </>
   );
 }
