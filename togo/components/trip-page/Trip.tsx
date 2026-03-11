@@ -12,6 +12,7 @@ import { TripProps } from "@/app/trip/page";
 import TripMap from "./TripMap";
 import MapLocation from "@/types/MapLocation";
 import AddItemModal, { AddItemModalFormSubmitData } from "./AddItemModal";
+import { deleteActivity, moveActivity } from "@/lib/db";
 
 const wishlistContainerId = "wishlistContainer";
 
@@ -22,7 +23,7 @@ interface tripInfo {
   tripId: string;
 }
 
-export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
+export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo) {
   // split screen resizing logic
   useEffect(() => {
     const dashboardContainer = document.getElementById("dashboardContainer");
@@ -134,7 +135,29 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
       );
     }
 
-    // TODO: update database to move ItineraryItem from one container to another
+    // Update database
+    const movedFirestoreId = movedItem.firestoreId;
+    if (movedFirestoreId) {
+      const isWishlist = destination.droppableId === wishlistContainerId;
+      let dayIndex: number | null = null;
+
+      if (!isWishlist) {
+        const destDay = itineraryDays.find(
+          (d) => getItineraryDayId(d.date) === destination.droppableId,
+        );
+        if (destDay) {
+          dayIndex = destDay.dayIndex;
+        }
+      }
+
+      moveActivity(
+        tripId,
+        movedFirestoreId,
+        dayIndex,
+        isWishlist,
+        destination.index,
+      ).catch((err) => console.error("Failed to move activity:", err));
+    }
   }
 
   /**
@@ -154,6 +177,14 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
    * @param id id of ItineraryItem
    */
   function deleteItineraryItem(id: number) {
+    // find item firestoreId before removing from state
+    const allItems = [
+      ...wishlistItems,
+      ...itineraryDays.flatMap((day) => day.items),
+    ];
+    const item = allItems.find((item) => item.id === id);
+    const firestoreId = item?.firestoreId;
+
     setWishlistItems((prev) => prev.filter((item) => item.id !== id));
 
     setItineraryDays((prev) =>
@@ -163,7 +194,12 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
       })),
     );
 
-    // TODO: remove itinerary item with id from database
+    // Remove from database
+    if (firestoreId) {
+      deleteActivity(tripId, firestoreId).catch((err) =>
+        console.error("Failed to delete activity:", err),
+      );
+    }
     // TODO: remove items marker from map
   }
 
@@ -231,6 +267,7 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
                 id={wishlistContainerId}
                 wishlist={true}
                 items={wishlistItems}
+                tripId={tripId}
                 onDisplayAddItemModal={displayAddItemModal}
                 onItemDelete={deleteItineraryItem}
               />
@@ -245,6 +282,7 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
                 <ItineraryDay
                   key={getItineraryDayId(dayContainer.date)}
                   {...dayContainer}
+                  tripId={tripId}
                   onDisplayAddItemModal={displayAddItemModal}
                   onItemDelete={deleteItineraryItem}
                 />

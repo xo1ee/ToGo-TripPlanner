@@ -5,7 +5,9 @@ import MapLocation from "@/types/MapLocation";
 
 export interface ItineraryDayProps {
   date: Date;
+  dayIndex: number;
   items: ItineraryItemProps[];
+  tripId?: string;
   onDisplayAddItemModal?: (originatingContainerId: string) => void;
   onItemDelete?: (id: number) => void;
 }
@@ -47,6 +49,7 @@ export default function ItineraryDay(props: ItineraryDayProps) {
           id={getItineraryDayId(props.date)}
           wishlist={false}
           items={props.items}
+          tripId={props.tripId}
           onDisplayAddItemModal={props.onDisplayAddItemModal}
           onItemDelete={props.onItemDelete}
         />

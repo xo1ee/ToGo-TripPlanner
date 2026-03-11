@@ -40,6 +40,13 @@ export interface ActivityDocument {
   index: number;
 }
 
+/* Returns the number of days between two dates (inclusive) */
+function daysBetween(start: Date, end: Date): number {
+  const startMs = new Date(start).setUTCHours(0, 0, 0, 0);
+  const endMs = new Date(end).setUTCHours(0, 0, 0, 0);
+  return Math.round((endMs - startMs) / (1000 * 60 * 60 * 24)) + 1;
+}
+
 // ─── Trips ─────────────────
 
 /* Fetch a single trip by ID */
@@ -99,6 +106,7 @@ export async function createTrip(
 export async function getTripActivities(
   tripId: string,
   startDate: Date,
+  endDate: Date,
 ): Promise<{
   wishlist: ItineraryItemProps[];
   itinerary: ItineraryDayProps[];
@@ -148,14 +156,16 @@ export async function getTripActivities(
       });
     });
 
-  // Convert day indexes to actual dates (startDate + N days)
-  const itinerary: ItineraryDayProps[] = Array.from(dayMap.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([dayIndex, items]) => {
+  // to find the # of days between startDate and endDate so we can generate all of them 
+  const totalDays = daysBetween(startDate, endDate);
+  const itinerary: ItineraryDayProps[] = Array.from(
+    { length: totalDays },
+    (_, dayIndex) => {
       const date = new Date(startDate);
       date.setUTCDate(date.getUTCDate() + dayIndex);
-      return { date, items };
-    });
+      return { date, dayIndex, items: dayMap.get(dayIndex) || [] };
+    },
+  );
 
   return { wishlist, itinerary };
 }

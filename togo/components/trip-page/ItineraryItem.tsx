@@ -2,6 +2,7 @@ import { Draggable } from "@hello-pangea/dnd";
 import { useRef, useState } from "react";
 import "./ItineraryItem.css";
 import MapLocation from "@/types/MapLocation";
+import { updateActivityNote } from "@/lib/db";
 
 export interface ItineraryItemProps {
   id: number;
@@ -13,6 +14,7 @@ export interface ItineraryItemProps {
   destImg?: string;
   itemNote?: string;
   firestoreId?: string; // Firestore document ID for DB
+  tripId?: string; // needed for DB operations
   onDelete?: (id: number) => void;
 }
 
@@ -39,9 +41,15 @@ export default function ItineraryItem(props: ItineraryItemProps) {
     setIsEditingNote(true);
   }
   function saveNote() {
-    setOriginalNote(noteRef.current?.value || "");
+    const newNote = noteRef.current?.value || "";
+    setOriginalNote(newNote);
     setIsEditingNote(false);
-    // TODO: update database
+
+    if (props.tripId && props.firestoreId) {
+      updateActivityNote(props.tripId, props.firestoreId, newNote).catch(
+        (err) => console.error("Failed to save note:", err),
+      );
+    }
   }
   function cancelNoteChanges() {
     if (noteRef.current) {

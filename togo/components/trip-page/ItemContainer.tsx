@@ -7,6 +7,7 @@ interface ItemContainerProps {
   id: string;
   wishlist: boolean;
   items: ItineraryItemProps[];
+  tripId?: string;
   onDisplayAddItemModal?: (originatingContainerId: string) => void;
   onItemDelete?: (id: number) => void;
 }
@@ -37,6 +38,7 @@ export default function ItemContainer(props: ItemContainerProps) {
                   {...item}
                   index={index}
                   wishlistItem={props.wishlist}
+                  tripId={props.tripId}
                   onDelete={props.onItemDelete}
                 />
               ))}
