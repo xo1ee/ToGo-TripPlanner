@@ -14,7 +14,7 @@ export interface ItineraryItemProps {
   destImg?: string;
   itemNote?: string;
   firestoreId?: string; // Firestore document ID for DB
-  tripId?: string; // needed for DB operations
+  tripId?: string; // needed for DB
   onDelete?: (id: number) => void;
 }
 

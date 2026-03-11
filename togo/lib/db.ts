@@ -37,7 +37,7 @@ export interface ActivityDocument {
   location?: MapLocation;
   isWishlist: boolean;
   day: number | null; // null if wishlist
-  index: number;
+  index: number; // order within the day
 }
 
 /* Returns the number of days between two dates (inclusive) */
