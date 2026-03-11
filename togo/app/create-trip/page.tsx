@@ -1,25 +1,27 @@
 "use client";
 
 import MapLocation from "@/types/MapLocation";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type PlaceAutocompleteSelectEvent = Event & {
   placePrediction?: google.maps.places.PlacePrediction;
 };
 
 interface FormValues {
-  destination: MapLocation | null;
+  location: MapLocation | null;
   startDate: string | null;
   endDate: string | null;
   users: string[];
 }
 
 export default function CreateTrip() {
-  const destinationInputRef =
+  const router = useRouter();
+  const locationInputRef =
     useRef<google.maps.places.PlaceAutocompleteElement>(null);
 
   const [formValues, setFormValues] = useState<FormValues>({
-    destination: null,
+    location: null,
     startDate: null,
     endDate: null,
     users: [""],
@@ -27,9 +29,9 @@ export default function CreateTrip() {
 
   // updates form values w/ selected location
   useEffect(() => {
-    const destInput = destinationInputRef.current;
-    if (!destInput) {
-      console.error("destinationInputRef.current is null");
+    const locationInput = locationInputRef.current;
+    if (!locationInput) {
+      console.error("locationInputRef.current is null");
       return;
     }
 
@@ -45,7 +47,7 @@ export default function CreateTrip() {
       if (place) {
         setFormValues((prev) => ({
           ...prev,
-          destination: {
+          location: {
             locationId: place.id,
             displayName: place.displayName ?? "Unknown",
             formattedAddress: place.formattedAddress ?? "",
@@ -58,8 +60,8 @@ export default function CreateTrip() {
       }
     }
 
-    destInput.addEventListener("gmp-select", onSelect);
-    return () => destInput.removeEventListener("gmp-select", onSelect);
+    locationInput.addEventListener("gmp-select", onSelect);
+    return () => locationInput.removeEventListener("gmp-select", onSelect);
   }, []);
 
   // updates remaining form values
@@ -74,12 +76,12 @@ export default function CreateTrip() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!formValues.destination) {
+    if (!formValues.location) {
       console.warn("No place selected yet");
       return;
     }
 
-    await fetch("/api/trips", {
+    const res = await fetch("/api/trips", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,8 +89,9 @@ export default function CreateTrip() {
       body: JSON.stringify(formValues),
     });
 
-    // debugging prints
-    // console.log("Values:", formValues);
+    const data = await res.json();
+
+    router.push(`/trip?tripId=${data.tripId}`);
   }
 
   return (
@@ -98,15 +101,15 @@ export default function CreateTrip() {
         <br></br>
         <form className="flex flex-col gap-2 w-80" onSubmit={handleSubmit}>
           <label
-            htmlFor="destination"
+            htmlFor="location"
             className="text-black font-bold font-medium text-left"
           >
             Destination
           </label>
           <gmp-place-autocomplete
-            id="destination"
-            ref={destinationInputRef}
-            name="destination"
+            id="location"
+            ref={locationInputRef}
+            name="location"
             {...({ placeholder: "E.g. New York" } as any)}
             className="border border-gray-400 rounded-md"
           ></gmp-place-autocomplete>

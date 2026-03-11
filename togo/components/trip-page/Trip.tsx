@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  ItineraryItemProps
-} from "@/components/trip-page/ItineraryItem";
+import { ItineraryItemProps } from "@/components/trip-page/ItineraryItem";
 import ItemContainer from "@/components/trip-page/ItemContainer";
 import ItineraryDay, {
   ItineraryDayProps,
@@ -183,11 +181,11 @@ export default function Trip({ tripInfo, wishlist, itinerary }: tripInfo) {
               <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
                 <img src="/calendar_icon.svg" alt="Calendar icon"></img>
                 <p id="tripDates" className="font-bold">
-                  {tripInfo.startDate.toLocaleDateString("en-US", {
+                  {new Date(tripInfo.startDate).toLocaleDateString("en-US", {
                     timeZone: "UTC",
                   })}{" "}
                   -{" "}
-                  {tripInfo.endDate.toLocaleDateString("en-US", {
+                  {new Date(tripInfo.endDate).toLocaleDateString("en-US", {
                     timeZone: "UTC",
                   })}
                 </p>

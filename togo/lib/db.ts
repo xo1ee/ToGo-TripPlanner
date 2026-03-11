@@ -51,8 +51,8 @@ export async function getTrip(tripId: string): Promise<TripDocument | null> {
     id: snap.id,
     userId: data.userId,
     tripName: data.tripName,
-    startDate: data.startDate.toDate(),
-    endDate: data.endDate.toDate(),
+    startDate: data.startDate,
+    endDate: data.endDate,
     location: data.location,
   };
 }
