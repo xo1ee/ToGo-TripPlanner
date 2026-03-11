@@ -165,10 +165,54 @@ export default function Trip({ tripInfo, wishlist, itinerary, tripId }: tripInfo
    * @param location location of item
    * @param containerId id of container
    */
-  function createItineraryItem(location: MapLocation, containerId: string) {
-    // TODO: create an ItineraryItem with default values
-    // TODO: add item to database to get ID
-    // TODO: add ItineraryItem it to container
+  async function createItineraryItem(location: MapLocation, containerId: string) {
+    let containerItems = getItemContainerItems(containerId);
+    
+    // fetch place description and photo from Google Places API (new)
+    let itemDesc = location.displayName;
+    let destImg: string | undefined;
+    try {
+      const place = new google.maps.places.Place({ id: location.locationId });
+      await place.fetchFields({ fields: ["editorialSummary", "photos"] });
+      if (place.editorialSummary) itemDesc = place.editorialSummary;
+      if (place.photos && place.photos.length > 0) {
+        destImg = place.photos[0].getURI({ maxWidth: 400 });
+      }
+    } catch (err) {
+      console.error("Failed to fetch place details:", err);
+    }
+
+    // create an ItineraryItem with default values
+    let itinItem: ItineraryItemProps = {
+      id: -1,
+      index: containerItems.length,
+      itemName: location.displayName,
+      itemDesc,
+      destImg,
+      location
+    };
+
+    // TODO: add item to database to get ID and set itinItem.id to it
+
+    // add ItineraryItem it to container
+    if (containerId == wishlistContainerId) {
+      // insert at front, shift all existing items' indices right by 1
+      itinItem.index = 0;
+      setWishlistItems((prev) => [
+        itinItem,
+        ...prev.map((item) => ({ ...item, index: item.index + 1 })),
+      ]);
+    } else {
+      // append to end (index is already containerItems.length)
+      setItineraryDays((prev) =>
+        prev.map((day) =>
+          getItineraryDayId(day.date) === containerId
+            ? { ...day, items: [...day.items, itinItem] }
+            : day,
+        ),
+      );
+    }
+
     // TODO: add marker to map
   }
 
