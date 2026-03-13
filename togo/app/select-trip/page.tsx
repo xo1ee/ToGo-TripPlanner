@@ -74,7 +74,7 @@ export default function SelectTrip() {
             <h1>Your Trips</h1>
             <a href="/create-trip" className="trip-form-submit">New Trip</a>
           </div>
-          <div className="mt-2 grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] justify-items-center gap-8">
+          <div className="mt-2 grid grid-cols-[repeat(4,15rem)] justify-center gap-8">
             {
               trips?.map(trip => (
                 <div key={trip.id} className="w-60 h-40">
