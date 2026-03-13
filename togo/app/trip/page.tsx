@@ -8,13 +8,14 @@ import Trip from "@/components/trip-page/Trip";
 import { useEffect, useState } from "react";
 import { getTrip, getTripActivities } from "@/lib/db";
 import MapLocation from "@/types/MapLocation";
+import { useAuth } from "@/context/AuthContext";
 
 interface TripPageProps {
   tripIdFromParams: string;
 }
 
 export interface TripProps {
-  userId: string; // Firebase UID are strings
+  userids: string[]; // users who can access trip
   tripName: string;
   startDate: Date;
   endDate: Date;
@@ -23,6 +24,7 @@ export interface TripProps {
 
 export default function TripPage({ tripIdFromParams }: TripPageProps) {
   const tripId = tripIdFromParams;
+  const { user, loading: authLoading } = useAuth();
 
   const [tripInfo, setTripInfo] = useState<TripProps | null>(null);
   const [wishlist, setWishlist] = useState<ItineraryItemProps[]>([]);
@@ -31,17 +33,39 @@ export default function TripPage({ tripIdFromParams }: TripPageProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (authLoading) {
+      setLoading(true);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
     if (!tripId) {
       setError("No trip ID provided. Use /trip/<tripId>.");
       setLoading(false);
       return;
     }
 
+    if (!user) {
+      setError("You must be signed in to view this trip.");
+      setLoading(false);
+      return;
+    }
+
+    const currentUser = user;
+
     async function loadTrip() {
       try {
         const trip = await getTrip(tripId as string);
         if (!trip) {
           setError("Trip not found.");
+          setLoading(false);
+          return;
+        }
+
+        if (!trip.users.includes(currentUser.uid)) {
+          setError("You do not have access to this trip.");
           setLoading(false);
           return;
         }
@@ -53,7 +77,7 @@ export default function TripPage({ tripIdFromParams }: TripPageProps) {
         );
 
         setTripInfo({
-          userId: trip.userId,
+          userids: trip.users,
           tripName: trip.tripName,
           startDate: trip.startDate,
           endDate: trip.endDate,
@@ -70,7 +94,7 @@ export default function TripPage({ tripIdFromParams }: TripPageProps) {
     }
 
     loadTrip();
-  }, [tripId]);
+  }, [tripId, authLoading, user]);
 
   if (loading) {
     return (

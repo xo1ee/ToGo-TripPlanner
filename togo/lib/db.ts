@@ -21,7 +21,7 @@ import MapLocation from "@/types/MapLocation";
 
 export interface TripDocument {
   id: string;
-  userId: string;
+  users: string[];
   tripName: string;
   startDate: Date;
   endDate: Date;
@@ -77,7 +77,7 @@ export async function getTrip(tripId: string): Promise<TripDocument | null> {
   const data = snap.data();
   return {
     id: snap.id,
-    userId: data.userId,
+    users: data.users,
     tripName: data.tripName,
     startDate: data.startDate.toDate(),
     endDate: data.endDate.toDate(),
@@ -96,7 +96,7 @@ export async function getUserTrips(userId: string): Promise<TripDocument[]> {
     const data = d.data();
     return {
       id: d.id,
-      userId: data.userId,
+      users: data.users,
       tripName: data.tripName,
       startDate: data.startDate.toDate(),
       endDate: data.endDate.toDate(),
