@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { getUserByEmail } from "@/lib/db";
+import { auth } from "@/lib/firebase";
 
 type PlaceAutocompleteSelectEvent = Event & {
   placePrediction?: google.maps.places.PlacePrediction;
@@ -15,12 +16,11 @@ interface FormValues {
   location: MapLocation | null;
   startDate: string | null;
   endDate: string | null;
-  users: string[]; // UIDs
 }
 
 export default function CreateTrip() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, signInWithGoogle } = useAuth();
   const locationInputRef = useRef<google.maps.places.PlaceAutocompleteElement>(null);
 
   const [formValues, setFormValues] = useState<FormValues>({
@@ -28,7 +28,6 @@ export default function CreateTrip() {
     location: null,
     startDate: null,
     endDate: null,
-    users: [],
   });
 
   // invite state
@@ -121,13 +120,31 @@ export default function CreateTrip() {
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    let activeUser = user;
+
+    // if not signed in, trigger OAuth popup first
+    if (activeUser === null) {
+      try {
+        await signInWithGoogle();
+        activeUser = auth.currentUser;
+      } catch {
+        alert("Sign-in is required to create a trip.");
+        return;
+      }
+    }
+
+    if (activeUser === null) {
+      alert("Sign-in is required to create a trip.");
+      return;
+    }
+
     if (!formValues.location) {
       console.warn("No place selected yet");
       return;
     }
 
     // build users array: creator + invited users
-    const allUsers = user ? [user.uid, ...invitedUids] : invitedUids;
+    const allUsers = [activeUser.uid, ...invitedUids];
 
     const res = await fetch("/api/trips", {
       method: "POST",
