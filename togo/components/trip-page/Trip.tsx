@@ -38,17 +38,22 @@ export default function Trip({
 }: tripInfoProp) {
   const [tripName, setTripName] = useState<string>(tripInfo?.tripName ?? "");
 
-  const [wishlistItems, setWishlistItems] =
-    useState<ItineraryItemProps[]>(wishlist);
-  const [itineraryDays, setItineraryDays] =
-    useState<ItineraryDayProps[]>(itinerary);
+  // States for ItineraryItem containers
+  const [wishlistItems, setWishlistItems] = useState<ItineraryItemProps[]>(wishlist);
+  const [itineraryDays, setItineraryDays] = useState<ItineraryDayProps[]>(itinerary);
+
+  // Modal for editing trip
+  const [titleModalHidden, setTitleModalHidden] = useState(true);
 
   // AddItemModel code (popup to add new destination)
   const [addItemModalHidden, setAddItemModalHidden] = useState(true);
-  const [titleModalHidden, setTitleModalHidden] = useState(true);
-  const [aimOgContainerId, setAimOgContainerId] =
-    useState<string>(wishlistContainerId);
+  // Add Item Modal container id (state used to set defaultChecked in modal form)
+  const [aimOgContainerId, setAimOgContainerId] = useState<string>(wishlistContainerId);
+  // used to update defaultChecked every time modal is opened
   const [addItemModalRenderKey, setAddItemModalRenderKey] = useState(0);
+
+  // selected itinerary item
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   // split screen resizing logic
   useEffect(() => {
@@ -71,6 +76,7 @@ export default function Trip({
       isDragging = true;
       startX = e.clientX;
       startWidth = dashboardContainer.offsetWidth;
+      // prevents user from selecting text on accident
       document.documentElement.classList.add("select-none");
     };
 
@@ -99,8 +105,7 @@ export default function Trip({
     };
   }, []);
 
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
-
+  // function to pan map to marker for itinerary item when it's clicked
   function handleItemFocus(id: string) {
     setSelectedItemId(id);
   }
@@ -285,8 +290,8 @@ export default function Trip({
     const item = allItems.find((item) => item.firestoreId === id);
     const firestoreId = item?.firestoreId;
 
+    // remove from page
     setWishlistItems((prev) => prev.filter((item) => item.firestoreId !== id));
-
     setItineraryDays((prev) =>
       prev.map((day) => ({
         ...day,
