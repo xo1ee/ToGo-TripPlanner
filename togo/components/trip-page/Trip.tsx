@@ -24,6 +24,9 @@ import {
 } from "@/lib/db";
 
 const wishlistContainerId = "wishlistContainer";
+const tripDateFormatter = new Intl.DateTimeFormat(undefined, {
+  timeZone: "UTC",
+});
 
 interface tripInfoProp {
   tripInfo: TripProps;
@@ -372,7 +375,8 @@ export default function Trip({
     const orphaned: ItineraryItemProps[] = [];
     const newDays: ItineraryDayProps[] = Array.from({ length: total }, (_, i) => {
       const date = new Date(newStart);
-      date.setDate(date.getDate() + i);
+      date.setUTCDate(date.getUTCDate() + i);
+      date.setUTCHours(0, 0, 0, 0);
       return { date, dayIndex: i, items: [] };
     });
 
@@ -422,9 +426,9 @@ export default function Trip({
                 <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
                   <img src="/calendar_icon.svg" alt="Calendar icon"></img>
                   <p id="tripDates" className="font-bold">
-                    {tripInfo.startDate.toLocaleDateString()}{" "}
+                    {tripDateFormatter.format(tripStartDate)}{" "}
                     -{" "}
-                    {tripInfo.endDate.toLocaleDateString()}
+                    {tripDateFormatter.format(tripEndDate)}
                   </p>
                 </div>
               </div>

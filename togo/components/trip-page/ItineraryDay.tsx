@@ -17,10 +17,11 @@ export const dateFormatter = new Intl.DateTimeFormat(undefined, {
   weekday: "long",
   month: "long",
   day: "numeric",
+  timeZone: "UTC",
 });
 
 export function getItineraryDayId(date: Date) {
-  return date.toLocaleDateString().replaceAll("/", "-");
+  return date.toISOString().split("T")[0];
 }
 
 export default function ItineraryDay(props: ItineraryDayProps) {

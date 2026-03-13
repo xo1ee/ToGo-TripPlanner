@@ -21,8 +21,12 @@ export async function POST(req: NextRequest) {
     const docRef = await addDoc(collection(db, TRIPS_COLLECTION), {
       tripName,
       location,
-      startDate: startDate ? Timestamp.fromDate(new Date(startDate)) : null,
-      endDate: endDate ? Timestamp.fromDate(new Date(endDate)) : null,
+      startDate: startDate
+        ? Timestamp.fromDate(new Date(`${startDate}T00:00:00Z`))
+        : null,
+      endDate: endDate
+        ? Timestamp.fromDate(new Date(`${endDate}T00:00:00Z`))
+        : null,
       users,
       createdAt: new Date(),
     });

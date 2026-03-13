@@ -228,7 +228,8 @@ export async function getTripActivities(
     { length: totalDays },
     (_, dayIndex) => {
       const date = new Date(startDate);
-      date.setDate(date.getDate() + dayIndex);
+      date.setUTCDate(date.getUTCDate() + dayIndex);
+      date.setUTCHours(0, 0, 0, 0);
       return { date, dayIndex, items: dayMap.get(dayIndex) || [] };
     },
   );
