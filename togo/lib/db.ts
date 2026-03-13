@@ -13,7 +13,6 @@ import {
 import { db } from "./firebase";
 import { ItineraryItemProps } from "@/components/trip-page/ItineraryItem";
 import { ItineraryDayProps } from "@/components/trip-page/ItineraryDay";
-import { TripProps } from "@/app/trip/page";
 import MapLocation from "@/types/MapLocation";
 
 // ─── Types ──────────────

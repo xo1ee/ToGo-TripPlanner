@@ -1,7 +1,6 @@
 import { useState } from "react";
 import ItemContainer from "./ItemContainer";
 import { ItineraryItemProps } from "./ItineraryItem";
-import MapLocation from "@/types/MapLocation";
 
 export interface ItineraryDayProps {
   date: Date;
@@ -13,6 +12,7 @@ export interface ItineraryDayProps {
   onItemFocus?: (id: string) => void;
 }
 
+// use undefined so it uses users broswer locale
 export const dateFormatter = new Intl.DateTimeFormat(undefined, {
   weekday: "long",
   month: "long",
