@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
+import { saveUser } from "@/lib/db";
 
 interface AuthContextType {
   user: User | null;
@@ -31,7 +32,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   async function signInWithGoogle() {
-    await signInWithPopup(auth, googleProvider);
+    const result = await signInWithPopup(auth, googleProvider);
+    const u = result.user;
+    await saveUser(u.uid, u.displayName ?? "", u.email ?? "", u.photoURL ?? "");
   }
 
   async function logout() {

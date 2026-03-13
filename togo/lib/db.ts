@@ -3,6 +3,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  setDoc,
   addDoc,
   updateDoc,
   deleteDoc,
@@ -44,6 +45,18 @@ function daysBetween(start: Date, end: Date): number {
   const startMs = new Date(start).setUTCHours(0, 0, 0, 0);
   const endMs = new Date(end).setUTCHours(0, 0, 0, 0);
   return Math.round((endMs - startMs) / (1000 * 60 * 60 * 24)) + 1;
+}
+
+// ─── Users ─────────────────
+
+/* Create or update user document on sign-in.
+   Uses setDoc with merge so it doesn't overwrite existing data. */
+export async function saveUser(uid: string, name: string, email: string, photoURL: string) {
+  await setDoc(doc(db, "users", uid), {
+    name,
+    email,
+    photoURL,
+  }, { merge: true });
 }
 
 // ─── Trips ─────────────────
