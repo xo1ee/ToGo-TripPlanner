@@ -8,7 +8,7 @@ export default function Header() {
 
   return (
     <nav className="header">
-      <Link href="/">
+      <Link href="/select-trip">
         <img src="/togo_logo.png" alt="ToGo" className="h-25 -my-9" />
       </Link>
 
