@@ -13,8 +13,7 @@ import TripMap from "./TripMap";
 import MapLocation from "@/types/MapLocation";
 import Modal from "./Modal";
 import AddItem, { AddItemFormSubmitData } from "./AddItem";
-import EditTripName from "./EditTripName";
-import EditDates from "./EditDates";
+import EditTrip, { EditTripUpdates } from "./EditTrip";
 import {
   ActivityDocument,
   addActivity,
@@ -46,8 +45,7 @@ export default function Trip({
   const [itineraryDays, setItineraryDays] = useState<ItineraryDayProps[]>(itinerary);
 
   // Modal states
-  const [titleModalHidden, setTitleModalHidden] = useState(true);
-  const [datesModalHidden, setDatesModalHidden] = useState(true);
+  const [editTripModalHidden, setEditTripModalHidden] = useState(true);
   const [tripStartDate, setTripStartDate] = useState<Date>(tripInfo.startDate);
   const [tripEndDate, setTripEndDate] = useState<Date>(tripInfo.endDate);
 
@@ -332,17 +330,8 @@ export default function Trip({
     closeModal(setAddItemModalHidden);
   }
 
-  /**
-   * calls PATCH to update the current trip's trip name
-   * @param event contains form content (new trip name)
-   */
-  async function editTripName(event: React.SubmitEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const formData = new FormData(event.currentTarget);
-    const newTripName = String(formData.get("name") ?? "");
-
-    const res = await fetch(`/api/trips`, {
+  async function updateTripName(newTripName: string) {
+    await fetch(`/api/trips`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -351,8 +340,6 @@ export default function Trip({
     });
 
     setTripName(newTripName);
-    const form = event.target as HTMLFormElement;
-    form.reset();
   }
 
   // get the day shift and total days for a proposed date change
@@ -405,7 +392,18 @@ export default function Trip({
     setWishlistItems((prev) => [...prev, ...orphaned]);
     setTripStartDate(newStart);
     setTripEndDate(newEnd);
-    closeModal(setDatesModalHidden);
+  }
+
+  async function handleTripEditSave(updates: EditTripUpdates) {
+    if (updates.tripName) {
+      await updateTripName(updates.tripName);
+    }
+
+    if (updates.startDate && updates.endDate) {
+      await handleDatesChange(updates.startDate, updates.endDate);
+    }
+
+    closeModal(setEditTripModalHidden);
   }
 
   return (
@@ -421,23 +419,20 @@ export default function Trip({
               {/* trip name and dates */}
               <div>
                 <h1 id="tripName">{tripName}</h1>
-                <button
-                  onClick={() => setDatesModalHidden(false)}
-                  className="dates-btn"
-                >
+                <div className="bg-gray-200 w-fit px-3 py-2 rounded-md my-3 flex gap-2">
                   <img src="/calendar_icon.svg" alt="Calendar icon"></img>
                   <p id="tripDates" className="font-bold">
-                    {tripStartDate.toLocaleDateString("en-US")}{" "}
+                    {tripInfo.startDate.toLocaleDateString()}{" "}
                     -{" "}
-                    {tripEndDate.toLocaleDateString("en-US")}
+                    {tripInfo.endDate.toLocaleDateString()}
                   </p>
-                </button>
+                </div>
               </div>
               {/* edit trip button */}
               <div className="ml-auto mt-3 position-static">
                 <button
                   className="h-7 w-7 cursor-pointer"
-                  onClick={() => setTitleModalHidden(false)}
+                  onClick={() => setEditTripModalHidden(false)}
                 >
                   <img src="/menu_vertical_icon.svg" alt="Edit Trip Icon" />
                 </button>
@@ -514,26 +509,15 @@ export default function Trip({
       </Modal>
 
       <Modal
-        hidden={titleModalHidden}
-        onClose={() => closeModal(setTitleModalHidden)}
+        hidden={editTripModalHidden}
+        onClose={() => closeModal(setEditTripModalHidden)}
       >
-        <EditTripName
-          handleSubmit={(event) => {
-            editTripName(event);
-            closeModal(setTitleModalHidden);
-          }}
-        ></EditTripName>
-      </Modal>
-
-      <Modal
-        hidden={datesModalHidden}
-        onClose={() => closeModal(setDatesModalHidden)}
-      >
-        <EditDates
+        <EditTrip
+          tripName={tripName}
           startDate={tripStartDate}
           endDate={tripEndDate}
-          onSave={handleDatesChange}
-          affectedCount={getAffectedCount(tripStartDate, tripEndDate)}
+          onSave={handleTripEditSave}
+          getAffectedCount={getAffectedCount}
         />
       </Modal>
     </>
