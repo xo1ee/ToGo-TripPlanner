@@ -5,6 +5,7 @@ import { getUserTrips, TripDocument } from "@/lib/db";
 import { useRouter } from "next/navigation";
 import TripCard from "@/components/select-trip-page/TripCard";
 import Header from "@/components/Header";
+import Link from "next/link";
 
 export default function SelectTrip() {
   const { user, loading: authLoading } = useAuth();
@@ -74,7 +75,7 @@ export default function SelectTrip() {
         <div className="w-full">
           <div className="flex items-center justify-between w-full">
             <h1>Your Trips</h1>
-            <a href="/create-trip" className="trip-form-submit">New Trip</a>
+            <Link href="/create-trip" className="trip-form-submit">New Trip</Link>
           </div>
           <div className="mt-2 grid grid-cols-[repeat(4,15rem)] justify-center gap-8">
             {
