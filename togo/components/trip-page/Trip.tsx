@@ -222,66 +222,71 @@ export default function Trip({
     location: MapLocation,
     containerId: string,
   ) {
-    const containerItems = getItemContainerItems(containerId);
-    const isWishlistItem = containerId === wishlistContainerId;
-
-    // fetch place description and photo from Google Places API (new)
-    let itemDesc = "";
-    let destImg: string | undefined;
     try {
-      const place = new google.maps.places.Place({ id: location.locationId });
-      await place.fetchFields({ fields: ["editorialSummary", "photos"] });
-      if (place.editorialSummary) itemDesc = place.editorialSummary;
-      if (place.photos && place.photos.length > 0) {
-        destImg = place.photos[0].getURI({ maxWidth: 400 });
+      const containerItems = getItemContainerItems(containerId);
+      const isWishlistItem = containerId === wishlistContainerId;
+
+      // fetch place description and photo from Google Places API (new)
+      let itemDesc = "";
+      let destImg: string | undefined;
+      try {
+        const place = new google.maps.places.Place({ id: location.locationId });
+        await place.fetchFields({ fields: ["editorialSummary", "photos"] });
+        if (place.editorialSummary) itemDesc = place.editorialSummary;
+        if (place.photos && place.photos.length > 0) {
+          destImg = place.photos[0].getURI({ maxWidth: 400 });
+        }
+      } catch (err) {
+        console.error("Failed to fetch place details:", err);
       }
-    } catch (err) {
-      console.error("Failed to fetch place details:", err);
-    }
 
-    // create an ItineraryItem with default values
-    const itinItem: ItineraryItemProps = {
-      firestoreId: "",
-      index: isWishlistItem ? 0 : containerItems.length,
-      itemName: location.displayName,
-      wishlistItem: isWishlistItem,
-      itemDesc,
-      destImg,
-      location,
-    };
+      // create an ItineraryItem with default values
+      const itinItem: ItineraryItemProps = {
+        firestoreId: "",
+        index: isWishlistItem ? 0 : containerItems.length,
+        itemName: location.displayName,
+        wishlistItem: isWishlistItem,
+        itemDesc,
+        destImg,
+        location,
+      };
 
-    const activityPayload: Omit<ActivityDocument, "tripId" | "id"> = {
-      index: itinItem.index,
-      itemName: itinItem.itemName,
-      itemDesc: itinItem.itemDesc,
-      destImg: itinItem.destImg,
-      location: itinItem.location,
-      isWishlist: isWishlistItem,
-      day: isWishlistItem
+      const activityPayload: Omit<ActivityDocument, "tripId" | "id"> = {
+        index: itinItem.index,
+        itemName: itinItem.itemName,
+        itemDesc: itinItem.itemDesc,
+        destImg: itinItem.destImg,
+        location: itinItem.location,
+        isWishlist: isWishlistItem,
+        day: isWishlistItem
         ? null
         : (itineraryDays.findIndex(
             (day) => getItineraryDayId(day.date) === containerId,
           ) ?? null),
-    };
-    const fid = await addActivity(tripId, activityPayload);
-    itinItem.firestoreId = fid;
+      };
+      const fid = await addActivity(tripId, activityPayload);
+      itinItem.firestoreId = fid;
 
-    // add ItineraryItem it to container
-    if (containerId == wishlistContainerId) {
-      // insert at front, shift all existing items' indices right by 1
-      setWishlistItems((prev) => [
-        itinItem,
-        ...prev.map((item) => ({ ...item, index: item.index + 1 })),
-      ]);
-    } else {
-      // append to end
-      setItineraryDays((prev) =>
-        prev.map((day) =>
-          getItineraryDayId(day.date) === containerId
-            ? { ...day, items: [...day.items, itinItem] }
-            : day,
-        ),
-      );
+      // add ItineraryItem it to container
+      if (containerId == wishlistContainerId) {
+        // insert at front, shift all existing items' indices right by 1
+        setWishlistItems((prev) => [
+          itinItem,
+          ...prev.map((item) => ({ ...item, index: item.index + 1 })),
+        ]);
+      } else {
+        // append to end
+        setItineraryDays((prev) =>
+          prev.map((day) =>
+            getItineraryDayId(day.date) === containerId
+              ? { ...day, items: [...day.items, itinItem] }
+              : day,
+          ),
+        );
+      }
+    } catch (err) {
+      console.error("Failed to create itinerary item:", err);
+      alert("Failed to create itinerary item. Please try again.");
     }
   }
 
@@ -335,15 +340,26 @@ export default function Trip({
   }
 
   async function updateTripName(newTripName: string) {
-    await fetch(`/api/trips`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ id: tripId, tripName: newTripName }),
-    });
+    try {
+      const res = await fetch(`/api/trips`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: tripId, tripName: newTripName }),
+      });
 
-    setTripName(newTripName);
+      if (!res.ok) {
+        console.error("Trip name update failed:", res.status, res.statusText);
+        alert("Failed to update trip name.");
+        return;
+      }
+
+      setTripName(newTripName);
+    } catch (err) {
+      console.error("Failed to update trip name:", err);
+      throw err;
+    }
   }
 
   // get the day shift and total days for a proposed date change
@@ -367,48 +383,66 @@ export default function Trip({
   }
 
   async function handleDatesChange(newStart: Date, newEnd: Date) {
-    await updateTripDates(tripId, tripStartDate, newStart, newEnd);
+    try {
+      await updateTripDates(tripId, tripStartDate, newStart, newEnd);
 
-    const shift = getDateShift(newStart);
-    const total = daysBetween(newStart, newEnd);
+      const shift = getDateShift(newStart);
+      const total = daysBetween(newStart, newEnd);
 
-    // build new empty days
-    const orphaned: ItineraryItemProps[] = [];
-    const newDays: ItineraryDayProps[] = Array.from({ length: total }, (_, i) => {
-      const date = new Date(newStart);
-      date.setUTCDate(date.getUTCDate() + i);
-      date.setUTCHours(0, 0, 0, 0);
-      return { date, dayIndex: i, items: [] };
-    });
+      // build new empty days
+      const orphaned: ItineraryItemProps[] = [];
+      const newDays: ItineraryDayProps[] = Array.from({ length: total }, (_, i) => {
+        const date = new Date(newStart);
+        date.setUTCDate(date.getUTCDate() + i);
+        date.setUTCHours(0, 0, 0, 0);
+        return { date, dayIndex: i, items: [] };
+      });
 
-    // slot existing activities into new days or orphan them
-    for (const day of itineraryDays) {
-      const shifted = day.dayIndex + shift;
-      for (const item of day.items) {
-        if (shifted < 0 || shifted >= total) {
-          orphaned.push({ ...item, wishlistItem: true });
-        } else {
-          newDays[shifted].items.push(item);
+      // slot existing activities into new days or orphan them
+      for (const day of itineraryDays) {
+        const shifted = day.dayIndex + shift;
+        for (const item of day.items) {
+          if (shifted < 0 || shifted >= total) {
+            orphaned.push({ ...item, wishlistItem: true });
+          } else {
+            newDays[shifted].items.push(item);
+          }
         }
       }
-    }
 
-    setItineraryDays(newDays);
-    setWishlistItems((prev) => [...prev, ...orphaned]);
-    setTripStartDate(newStart);
-    setTripEndDate(newEnd);
+      setItineraryDays(newDays);
+      setWishlistItems((prev) => [...prev, ...orphaned]);
+      setTripStartDate(newStart);
+      setTripEndDate(newEnd);
+    } catch (err) {
+      console.error("Failed to update trip dates:", err);
+      throw err;
+    }
   }
 
   async function handleTripEditSave(updates: EditTripUpdates) {
+    let failedToUpdate = false;
     if (updates.tripName) {
-      await updateTripName(updates.tripName);
+      try {
+        await updateTripName(updates.tripName);
+      } catch (err) {
+        failedToUpdate = true;
+      }
     }
 
     if (updates.startDate && updates.endDate) {
-      await handleDatesChange(updates.startDate, updates.endDate);
+      try {
+        await handleDatesChange(updates.startDate, updates.endDate);
+      } catch (err) {
+        failedToUpdate = true;
+      }
     }
 
-    closeModal(setEditTripModalHidden);
+    if (!failedToUpdate) {
+      closeModal(setEditTripModalHidden);
+    } else {
+      alert("Failed to save trip details. Please try again.");
+    }
   }
 
   return (

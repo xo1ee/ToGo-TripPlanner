@@ -61,7 +61,7 @@ body {
     border-radius: 0.375rem;
   }
   .header {
-    position: fixed;
+    position: static;
     z-index: 50;
     top: 0;
     width: 100%;

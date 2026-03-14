@@ -24,6 +24,7 @@ export default function AddItem(props: AddItemProps) {
     useRef<google.maps.places.PlaceAutocompleteElement>(null);
   const inputDaySelectionFieldset = useRef<HTMLFieldSetElement>(null);
   const [selectedPlace, setSelectedPlace] = useState<MapLocation | null>(null);
+  const [formErrMsg, setFormErrMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const destInput = destinationInputRef.current;
@@ -36,21 +37,25 @@ export default function AddItem(props: AddItemProps) {
       const prediction = event.placePrediction;
       if (!prediction) return;
 
-      const place = prediction.toPlace();
-      await place.fetchFields({
-        fields: ["id", "displayName", "formattedAddress", "location"],
-      });
-
-      if (place) {
-        setSelectedPlace({
-          locationId: place.id,
-          displayName: place.displayName ?? "Unknown",
-          formattedAddress: place.formattedAddress ?? "",
-          locationLat: place.location?.lat() ?? 0,
-          locationLon: place.location?.lng() ?? 0,
+      try {
+        const place = prediction.toPlace();
+        await place.fetchFields({
+          fields: ["id", "displayName", "formattedAddress", "location"],
         });
-      } else {
-        console.error("Failed to fetch Place");
+
+        if (place) {
+          setSelectedPlace({
+            locationId: place.id,
+            displayName: place.displayName ?? "Unknown",
+            formattedAddress: place.formattedAddress ?? "",
+            locationLat: place.location?.lat() ?? 0,
+            locationLon: place.location?.lng() ?? 0,
+          });
+        } else {
+          console.error("Failed to fetch Place");
+        }
+      } catch (err) {
+        console.error("Failed to process selected destination:", err);
       }
     }
 
@@ -62,7 +67,7 @@ export default function AddItem(props: AddItemProps) {
     event.preventDefault();
 
     if (!selectedPlace) {
-      console.warn("No place selected yet");
+      setFormErrMsg("No destination selected.");
       return;
     }
 
@@ -138,6 +143,8 @@ export default function AddItem(props: AddItemProps) {
             </label>
           ))}
         </fieldset>
+        <p className="text-red-600">{formErrMsg}</p>
+
         <br />
 
         <div className="flex justify-center">

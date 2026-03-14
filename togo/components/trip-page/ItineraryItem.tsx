@@ -68,7 +68,10 @@ export default function ItineraryItem(props: ItineraryItemProps) {
 
     if (props.tripId && props.firestoreId) {
       updateActivityNote(props.tripId, props.firestoreId, newNote).catch(
-        (err) => console.error("Failed to save note:", err),
+        (err) => {
+          console.error("Failed to save note:", err);
+          alert("Failed to save note. Please try again.");
+        }
       );
     }
   }
