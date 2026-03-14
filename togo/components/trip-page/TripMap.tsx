@@ -51,7 +51,7 @@ export default function TripMap({ lat, lon, itinerary, selectedItemId }: MapView
 
   return (
     <Map
-      mapId={"d324cbd014b8ccf5e5e023e5"}
+      mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID}
       defaultZoom={13}
       defaultCenter={{ lat: lat, lng: lon }}
     >
