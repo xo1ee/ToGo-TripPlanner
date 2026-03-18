@@ -17,6 +17,7 @@ import EditTrip, { EditTripUpdates } from "./EditTrip";
 import {
   ActivityDocument,
   addActivity,
+  updateTripName as updateTripNameInDb,
   deleteActivity,
   moveActivity,
   updateTripDates,
@@ -341,19 +342,7 @@ export default function Trip({
 
   async function updateTripName(newTripName: string) {
     try {
-      const res = await fetch(`/api/trips`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id: tripId, tripName: newTripName }),
-      });
-
-      if (!res.ok) {
-        console.error("Trip name update failed:", res.status, res.statusText);
-        alert("Failed to update trip name.");
-        return;
-      }
+      await updateTripNameInDb(tripId, newTripName);
 
       setTripName(newTripName);
     } catch (err) {

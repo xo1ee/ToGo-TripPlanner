@@ -4,7 +4,7 @@ import MapLocation from "@/types/MapLocation";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { daysBetween } from "@/lib/db";
+import { createTripForUsers, daysBetween } from "@/lib/db";
 import { auth } from "@/lib/firebase";
 import Header from "@/components/Header";
 
@@ -156,33 +156,16 @@ export default function CreateTrip() {
     }
 
     try {
-      const res = await fetch("/api/trips", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formValues,
-          tripName: formValues.tripName || `Trip to ${formValues.location.displayName}`,
-          users: allUsers,
-          locationImg: destImg
-        }),
-      });
+      const tripId = await createTripForUsers(
+        allUsers,
+        formValues.tripName || `Trip to ${formValues.location.displayName}`,
+        formValues.startDate,
+        formValues.endDate,
+        formValues.location,
+        destImg,
+      );
 
-      if (!res.ok) {
-        console.error("Trip creation failed:", res.status, res.statusText);
-        setFormErrMsg(`${res.status}: ${res.statusText}`);
-        return;
-      }
-
-      const data = await res.json();
-      if (!data?.tripId) {
-        console.error("Trip creation response missing tripId", data);
-        setFormErrMsg(`Failed to create trip. Please try again.`);
-        return;
-      }
-
-      router.push(`/trip/${data.tripId}`);
+      router.push(`/trip/${tripId}`);
     } catch (err) {
       console.error("Failed to create trip:", err);
       setFormErrMsg(`Failed to create trip. Please try again.`);

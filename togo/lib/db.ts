@@ -1,4 +1,5 @@
 import {
+  Timestamp,
   collection,
   doc,
   getDoc,
@@ -128,25 +129,50 @@ export async function getUserTrips(userId: string): Promise<TripDocument[]> {
   }
 }
 
-/* Create a new trip */
-export async function createTrip(
-  userId: string,
+/* Create a new trip document for one or more users.
+   Dates are normalized to midnight UTC for stable day math. */
+export async function createTripForUsers(
+  users: string[],
   tripName: string,
-  startDate: Date,
-  endDate: Date,
+  startDate: string | Date,
+  endDate: string | Date,
   location: MapLocation,
+  locationImg?: string,
 ): Promise<string> {
   try {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
     const ref = await addDoc(collection(db, "trips"), {
-      userId,
+      users,
       tripName,
-      startDate,
-      endDate,
+      startDate: Timestamp.fromDate(
+        new Date(`${start.toISOString().slice(0, 10)}T00:00:00Z`),
+      ),
+      endDate: Timestamp.fromDate(
+        new Date(`${end.toISOString().slice(0, 10)}T00:00:00Z`),
+      ),
       location,
+      locationImg,
+      createdAt: new Date(),
     });
+
     return ref.id;
   } catch (error) {
-    console.error("Failed to create trip:", error);
+    console.error("Failed to create trip for users:", error);
+    throw error;
+  }
+}
+
+/* Update a trip's display name */
+export async function updateTripName(
+  tripId: string,
+  tripName: string,
+): Promise<void> {
+  try {
+    await updateDoc(doc(db, "trips", tripId), { tripName });
+  } catch (error) {
+    console.error("Failed to update trip name:", error);
     throw error;
   }
 }
