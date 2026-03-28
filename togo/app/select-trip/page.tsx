@@ -71,16 +71,16 @@ export default function SelectTrip() {
   return (
     <>
       <Header />
-      <div className="m-15 h-full w-6/10 mx-auto flex flex-col items-center">
+      <div className="mx-auto h-full w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="w-full">
           <div className="flex items-center justify-between w-full">
             <h1>Your Trips</h1>
             <Link href="/create-trip" className="trip-form-submit">New Trip</Link>
           </div>
-          <div className="mt-2 grid grid-cols-[repeat(4,15rem)] justify-center gap-8">
+          <div className="mt-4 grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {
               trips?.map(trip => (
-                <div key={trip.id} className="w-60 h-40">
+                <div key={trip.id} className="w-full max-w-60 h-40">
                   <TripCard tripId={trip.id} tripName={trip.tripName} tripImgUrl={trip.locationImg} />
                 </div>
               ))
